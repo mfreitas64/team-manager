@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Player</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">🏀 Team Manager</a>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Edit Player</h2>
+
+  <form method="post" class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Season Year</label>
+      <input name="season_year" class="form-control" value="{{ player.season_year }}" required>
+    </div>
+
+    <div class="col-md-8">
+      <label class="form-label">Player Name</label>
+      <input name="name" class="form-control" value="{{ player.name }}" required>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Escalão</label>
+      <input name="escalao" class="form-control" value="{{ player.escalao }}">
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Nº Carteira</label>
+      <input name="n_carteira" class="form-control" value="{{ player.n_carteira }}">
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Date of Birth</label>
+      <input type="date" name="dob" class="form-control" value="{{ player.dob }}">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Mobile Phone</label>
+      <input name="mobile_phone" class="form-control" value="{{ player.mobile_phone }}">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Email</label>
+      <input name="email" class="form-control" value="{{ player.email }}">
+    </div>
+
+    <div class="col-12">
+      <button type="submit" class="btn btn-success">💾 Save Changes</button>
+      <a href="/players" class="btn btn-secondary ms-2">⬅️ Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

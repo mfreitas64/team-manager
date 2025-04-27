@@ -84,6 +84,7 @@
       <th>DOB</th>
       <th>Phone</th>
       <th>Email</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -95,6 +96,9 @@
         <td>{{ player.dob }}</td>
         <td>{{ player.mobile_phone }}</td>
         <td>{{ player.email }}</td>
+        <td>
+          <a href="/edit-player/{{ player.id }}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
+        </td>
       </tr>
     {% endfor %}
   </tbody>

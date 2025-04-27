@@ -6,11 +6,14 @@ from io import BytesIO, StringIO
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 import csv
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 app = Flask(__name__)
 
 # SQLite DB config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://team_manager_user:ydrZs6KW4wnssxSxIswegqk9xRuuUx6P@dpg-d073k5pr0fns73862qm0-a/team_manager_xjy0'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -449,9 +452,12 @@ def dashboard_minutes():
 @app.route('/dashboard-totals')
 def dashboard_totals():
     players = PlayerModel.query.order_by(PlayerModel.name).all()
-
     from collections import defaultdict
     totals_data = defaultdict(lambda: {"games_played": 0, "practices_attended": 0})
+
+    # Initialize all players
+    for player in players:
+        totals_data[player.name]
 
     matrix_entries = TournamentMatrixModel.query.filter_by(played=True).all()
     seen_games = set()
@@ -467,7 +473,9 @@ def dashboard_totals():
         players_present = [p.strip() for p in reg.players_present.split(',') if p.strip()]
         for p in players_present:
             totals_data[p]["practices_attended"] += 1
-
+    
+    # print(totals_data)
+    
     return render_template('dashboard_totals.html',
                            players=players,
                            totals_data=totals_data)
@@ -550,6 +558,24 @@ def export_totals_csv():
     output.headers["Content-Disposition"] = "attachment; filename=dashboard_totals.csv"
     output.headers["Content-type"] = "text/csv"
     return output
+
+@app.route('/edit-player/<int:player_id>', methods=['GET', 'POST'])
+def edit_player(player_id):
+    player = PlayerModel.query.get_or_404(player_id)
+
+    if request.method == 'POST':
+        # Update player fields
+        player.season_year = request.form['season_year']
+        player.name = request.form['name'].strip()  # Strip spaces automatically!
+        player.escalao = request.form['escalao']
+        player.n_carteira = request.form['n_carteira']
+        player.dob = request.form['dob']
+        player.mobile_phone = request.form['mobile_phone']
+        player.email = request.form['email']
+        db.session.commit()
+        return redirect('/players')
+
+    return render_template('edit_player.html', player=player)
 
 if __name__ == '__main__':
     from os import environ
