@@ -10,7 +10,7 @@ import csv
 app = Flask(__name__)
 
 # SQLite DB config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///players.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://team_manager_user:ydrZs6KW4wnssxSxIswegqk9xRuuUx6P@dpg-d073k5pr0fns73862qm0-a/team_manager_xjy0'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
