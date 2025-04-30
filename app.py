@@ -7,16 +7,31 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 import csv
 from dotenv import load_dotenv
+from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from os import environ
+
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "my-super-secret-dev-key")
 
-# SQLite DB config
+# DB config
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize extensions AFTER app is created
 db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Redirect to login page if not logged in
+
+# User loader for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    return UserModel.query.get(int(user_id))
 
 # Database model
 class PlayerModel(db.Model):
@@ -65,9 +80,69 @@ class PracticeRegisterModel(db.Model):
     coach_notes = db.Column(db.Text)
     duration_minutes = db.Column(db.Integer)
 
+class UserModel(db.Model, UserMixin):
+    __tablename__ = 'user_model'  # Add this line!
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(150), nullable=False, unique=True)
+    password_hash = db.Column(db.String(512), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 # Initialize DB
 with app.app_context():
     db.create_all()
+
+from sqlalchemy import text  # ✅ Add this at the top of your file
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email'].strip()
+        password = request.form['password']
+
+        user = UserModel.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            login_user(user)
+            return redirect('/')
+        else:
+            return "Invalid email or password."
+
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/login')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        
+        username = request.form['username'].strip()
+        email = request.form['email'].strip()
+        password = request.form['password']
+
+        existing_user = UserModel.query.filter_by(email=email).first()
+        if existing_user:
+            return "User already exists with this email."
+
+        new_user = UserModel(username=username, email=email)
+        new_user.set_password(password)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect('/login')
+
+    return render_template('signup.html')
 
 @app.route('/')
 def home():
@@ -81,6 +156,7 @@ def home():
                            practice_log_count=practice_log_count)
 
 @app.route('/players', methods=['GET', 'POST'])
+@login_required  # Ensure user is logged in to access this route
 def manage_players():
     if request.method == 'POST':
         new_player = PlayerModel(
@@ -101,6 +177,7 @@ def manage_players():
     return render_template('players.html', players=all_players, open_form=open_form)
 
 @app.route('/practice-exercises', methods=['GET', 'POST'])
+@login_required
 def practice_exercises():
     if request.method == 'POST':
         new_exercise = PracticeExerciseModel(
@@ -121,6 +198,7 @@ def practice_exercises():
     return render_template('practice_exercises.html', exercises=exercises, open_form=open_form)
 
 @app.route('/tournaments', methods=['GET', 'POST'])
+@login_required
 def manage_tournaments():
     all_players = PlayerModel.query.all()
 
@@ -148,6 +226,7 @@ def manage_tournaments():
     return render_template('tournaments.html', tournaments=all_tournaments, players=all_players, open_form=open_form)
 
 @app.route('/tournament/<int:tournament_id>/pdf')
+@login_required
 def generate_tournament_pdf(tournament_id):
     tournament = TournamentModel.query.get_or_404(tournament_id)
     buffer = BytesIO()
@@ -226,6 +305,7 @@ def generate_tournament_pdf(tournament_id):
                      mimetype='application/pdf')
 
 @app.route('/tournament/<int:tournament_id>', methods=['GET', 'POST'])
+@login_required
 def tournament_detail(tournament_id):
     tournament = TournamentModel.query.get_or_404(tournament_id)
     players = [p.strip() for p in tournament.players.split(',') if p.strip()]
@@ -275,6 +355,7 @@ def tournament_detail(tournament_id):
                            stats=stats)
 
 @app.route('/tournament/<int:tournament_id>/export/csv')
+@login_required
 def export_tournament_csv(tournament_id):
     tournament = TournamentModel.query.get_or_404(tournament_id)
     matrix_entries = TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).all()
@@ -305,6 +386,7 @@ def export_tournament_csv(tournament_id):
     )
 
 @app.route('/tournament/<int:tournament_id>/edit-notes', methods=['POST'])
+@login_required
 def update_coach_notes(tournament_id):
     tournament = TournamentModel.query.get_or_404(tournament_id)
     tournament.coach_notes = request.form.get('coach_notes', '')
@@ -312,6 +394,7 @@ def update_coach_notes(tournament_id):
     return redirect(f'/tournament/{tournament_id}')
 
 @app.route('/tournament/<int:tournament_id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_tournament(tournament_id):
     tournament = TournamentModel.query.get_or_404(tournament_id)
     all_players = PlayerModel.query.all()
@@ -336,6 +419,7 @@ def edit_tournament(tournament_id):
                            current_opponents=current_opponents)
 
 @app.route('/practice-register', methods=['GET', 'POST'])
+@login_required
 def practice_register():
     all_players = PlayerModel.query.all()
     all_exercises = PracticeExerciseModel.query.all()
@@ -375,6 +459,7 @@ def practice_register():
                            registers=past_registers)
 
 @app.route('/practice-exercise/<int:exercise_id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_practice_exercise(exercise_id):
     exercise = PracticeExerciseModel.query.get_or_404(exercise_id)
 
@@ -392,6 +477,7 @@ def edit_practice_exercise(exercise_id):
     return render_template('edit_practice_exercise.html', exercise=exercise)
 
 @app.route('/practice-register/<int:register_id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_practice_register(register_id):
     register = PracticeRegisterModel.query.get_or_404(register_id)
     all_players = PlayerModel.query.all()
@@ -417,6 +503,7 @@ def edit_practice_register(register_id):
                            selected_exercises=selected_exercises)
 
 @app.route('/dashboard-minutes')
+@login_required
 def dashboard_minutes():
     players = PlayerModel.query.order_by(PlayerModel.name).all()
     registers = PracticeRegisterModel.query.all()
@@ -450,6 +537,7 @@ def dashboard_minutes():
                            chart_practiced=practice_minutes)
 
 @app.route('/dashboard-totals')
+@login_required
 def dashboard_totals():
     players = PlayerModel.query.order_by(PlayerModel.name).all()
     from collections import defaultdict
@@ -481,6 +569,7 @@ def dashboard_totals():
                            totals_data=totals_data)
 
 @app.route('/export-minutes-csv')
+@login_required
 def export_minutes_csv():
     players = PlayerModel.query.order_by(PlayerModel.name).all()
     registers = PracticeRegisterModel.query.all()
@@ -519,6 +608,7 @@ def export_minutes_csv():
     return output
 
 @app.route('/export-totals-csv')
+@login_required
 def export_totals_csv():
     players = PlayerModel.query.order_by(PlayerModel.name).all()
 
@@ -560,6 +650,7 @@ def export_totals_csv():
     return output
 
 @app.route('/edit-player/<int:player_id>', methods=['GET', 'POST'])
+@login_required
 def edit_player(player_id):
     player = PlayerModel.query.get_or_404(player_id)
 
@@ -578,5 +669,4 @@ def edit_player(player_id):
     return render_template('edit_player.html', player=player)
 
 if __name__ == '__main__':
-    from os import environ
     app.run(host='0.0.0.0', port=int(environ.get('PORT', 5000)))
