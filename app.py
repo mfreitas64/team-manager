@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, send_file, make_response
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from player import Player
 from datetime import datetime, timezone
 from io import BytesIO, StringIO
@@ -11,6 +12,7 @@ from flask_login import UserMixin, LoginManager, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from os import environ
+from collections import defaultdict
 
 load_dotenv()
 
@@ -36,6 +38,7 @@ def load_user(user_id):
 # Database model
 class PlayerModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
     season_year = db.Column(db.String(10), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     escalao = db.Column(db.String(50), nullable=False)
@@ -46,6 +49,7 @@ class PlayerModel(db.Model):
 
 class PracticeExerciseModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'))
     category = db.Column(db.String(100), nullable=False)
     needed_material = db.Column(db.String(200))
     execution_description = db.Column(db.Text)
@@ -57,6 +61,7 @@ class PracticeExerciseModel(db.Model):
 
 class TournamentModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'))
     date = db.Column(db.String(20), nullable=False)
     place = db.Column(db.String(100), nullable=False)
     team_name = db.Column(db.String(100), nullable=False)
@@ -74,6 +79,7 @@ class TournamentMatrixModel(db.Model):
 
 class PracticeRegisterModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'))
     date = db.Column(db.String(20), nullable=False)
     players_present = db.Column(db.Text)  # comma-separated player names
     exercises_used = db.Column(db.Text)   # comma-separated exercise IDs
@@ -97,8 +103,6 @@ class UserModel(db.Model, UserMixin):
 # Initialize DB
 with app.app_context():
     db.create_all()
-
-from sqlalchemy import text  # ✅ Add this at the top of your file
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -160,6 +164,7 @@ def home():
 def manage_players():
     if request.method == 'POST':
         new_player = PlayerModel(
+            user_id=current_user.id,
             season_year=request.form['season_year'],
             name=request.form['name'],
             escalao=request.form['escalao'],
@@ -173,7 +178,7 @@ def manage_players():
         return redirect('/players?open=form')  # 🔁 redirect with a flag
 
     open_form = request.args.get('open') == 'form'  # 👈 read the flag
-    all_players = PlayerModel.query.all()
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
     return render_template('players.html', players=all_players, open_form=open_form)
 
 @app.route('/practice-exercises', methods=['GET', 'POST'])
@@ -181,26 +186,31 @@ def manage_players():
 def practice_exercises():
     if request.method == 'POST':
         new_exercise = PracticeExerciseModel(
+            user_id=current_user.id,  # 🔐 associate with current user
             category=request.form['category'],
             needed_material=request.form['needed_material'],
             execution_description=request.form['execution_description'],
             image1=request.form.get('image1'),
             image2=request.form.get('image2'),
             image3=request.form.get('image3'),
-            image4=request.form.get('image4')
+            image4=request.form.get('image4'),
+            creation_date=datetime.now().strftime("%Y-%m-%d")  # optional: ensure it's set
         )
         db.session.add(new_exercise)
         db.session.commit()
         return redirect('/practice-exercises?open=form')  # keeps form open after submit
 
     open_form = request.args.get('open') == 'form'
-    exercises = PracticeExerciseModel.query.order_by(PracticeExerciseModel.creation_date.desc()).all()
+    
+    # 🔐 Only show this user's exercises
+    exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id).order_by(PracticeExerciseModel.creation_date.desc()).all()
+
     return render_template('practice_exercises.html', exercises=exercises, open_form=open_form)
 
 @app.route('/tournaments', methods=['GET', 'POST'])
 @login_required
 def manage_tournaments():
-    all_players = PlayerModel.query.all()
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
 
     if request.method == 'POST':
         opponents = [
@@ -210,6 +220,7 @@ def manage_tournaments():
         selected_players = request.form.getlist('players')
 
         tournament = TournamentModel(
+            user_id=current_user.id,
             date=request.form['date'],
             place=request.form['place'],
             team_name=request.form['team_name'],
@@ -222,13 +233,18 @@ def manage_tournaments():
         return redirect('/tournaments?open=form')  # 🔁 keep form open
 
     open_form = request.args.get('open') == 'form'
-    all_tournaments = TournamentModel.query.order_by(TournamentModel.date.desc()).all()
+    all_tournaments = TournamentModel.query.filter_by(user_id=current_user.id).order_by(TournamentModel.date.desc()).all()
     return render_template('tournaments.html', tournaments=all_tournaments, players=all_players, open_form=open_form)
 
 @app.route('/tournament/<int:tournament_id>/pdf')
 @login_required
 def generate_tournament_pdf(tournament_id):
+    
     tournament = TournamentModel.query.get_or_404(tournament_id)
+
+    if tournament.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=landscape(A4))
     width, height = landscape(A4)
@@ -307,7 +323,12 @@ def generate_tournament_pdf(tournament_id):
 @app.route('/tournament/<int:tournament_id>', methods=['GET', 'POST'])
 @login_required
 def tournament_detail(tournament_id):
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
+
+    if tournament.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+    
     players = [p.strip() for p in tournament.players.split(',') if p.strip()]
     opponents = [op.strip() for op in tournament.opponents.split(',') if op.strip()]
     periods = [1, 2, 3, 4]
@@ -357,7 +378,12 @@ def tournament_detail(tournament_id):
 @app.route('/tournament/<int:tournament_id>/export/csv')
 @login_required
 def export_tournament_csv(tournament_id):
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
+
+    if tournament.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+    
     matrix_entries = TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).all()
 
     # Write to a text buffer
@@ -388,7 +414,12 @@ def export_tournament_csv(tournament_id):
 @app.route('/tournament/<int:tournament_id>/edit-notes', methods=['POST'])
 @login_required
 def update_coach_notes(tournament_id):
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
+
+    if tournament.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+    
     tournament.coach_notes = request.form.get('coach_notes', '')
     db.session.commit()
     return redirect(f'/tournament/{tournament_id}')
@@ -396,8 +427,13 @@ def update_coach_notes(tournament_id):
 @app.route('/tournament/<int:tournament_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_tournament(tournament_id):
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
-    all_players = PlayerModel.query.all()
+
+    if tournament.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
 
     if request.method == 'POST':
         tournament.date = request.form['date']
@@ -421,17 +457,19 @@ def edit_tournament(tournament_id):
 @app.route('/practice-register', methods=['GET', 'POST'])
 @login_required
 def practice_register():
-    all_players = PlayerModel.query.all()
-    all_exercises = PracticeExerciseModel.query.all()
+
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
+    all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id).all()
 
     if request.method == 'POST':
         date = request.form['date']
         notes = request.form.get('coach_notes', '')
         players_present = ','.join(request.form.getlist('players'))
         exercises_used = ','.join(request.form.getlist('exercises'))
-        duration = int(request.form.get('duration_minutes', 0))
+        duration = request.form.get('duration_minutes', 0)
 
         register = PracticeRegisterModel(
+            user_id=current_user.id,  # 🔐 attach to logged-in user
             date=date,
             players_present=players_present,
             exercises_used=exercises_used,
@@ -442,17 +480,19 @@ def practice_register():
         db.session.commit()
         return redirect('/practice-register')
 
-    # fetch all exercises once
-    exercise_map = {str(e.id): f"{e.category} – {e.execution_description[:40]}..." for e in PracticeExerciseModel.query.all()}
+    # Load only this user’s practices
+    past_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).order_by(PracticeRegisterModel.date.desc()).all()
+    
+    # Map exercises for display
+    exercise_map = {str(e.id): f"{e.category} – {e.execution_description[:40]}..." for e in PracticeExerciseModel.query.filter_by(user_id=current_user.id).all()}
 
-    past_registers = PracticeRegisterModel.query.order_by(PracticeRegisterModel.date.desc()).all()
 
-    # Enrich each register with readable exercises
     for r in past_registers:
         if r.exercises_used:
             r.exercise_labels = [exercise_map.get(eid.strip(), f"ID {eid.strip()}") for eid in r.exercises_used.split(',')]
         else:
             r.exercise_labels = []
+
     return render_template('practice_register.html',
                            players=all_players,
                            exercises=all_exercises,
@@ -461,7 +501,12 @@ def practice_register():
 @app.route('/practice-exercise/<int:exercise_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_practice_exercise(exercise_id):
-    exercise = PracticeExerciseModel.query.get_or_404(exercise_id)
+
+    exercise = PracticeExerciseModel.query.filter_by(user_id=current_user.id).all()
+
+    # 🔐 Prevent editing another user's exercise
+    if exercise.user_id != current_user.id:
+        return "⛔️ Unauthorized access", 403
 
     if request.method == 'POST':
         exercise.category = request.form['category']
@@ -479,9 +524,15 @@ def edit_practice_exercise(exercise_id):
 @app.route('/practice-register/<int:register_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_practice_register(register_id):
-    register = PracticeRegisterModel.query.get_or_404(register_id)
-    all_players = PlayerModel.query.all()
-    all_exercises = PracticeExerciseModel.query.all()
+
+    # 🔐 Prevent editing others' data
+    if register.user_id != current_user.id:
+        return "⛔️ Unauthorized", 403
+
+    register = PracticeRegisterModel.query.query.filter_by(user_id=current_user.id).all()
+
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
+    all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id).all()
 
     if request.method == 'POST':
         register.date = request.form['date']
@@ -505,9 +556,19 @@ def edit_practice_register(register_id):
 @app.route('/dashboard-minutes')
 @login_required
 def dashboard_minutes():
-    players = PlayerModel.query.order_by(PlayerModel.name).all()
-    registers = PracticeRegisterModel.query.all()
-    matrix_entries = TournamentMatrixModel.query.filter_by(played=True).all()
+
+    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
+    
+    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
+
+    # Step 1: Get the current user's tournament IDs
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+
+    # Step 2: Filter matrix entries to only those tournaments
+    matrix_entries = TournamentMatrixModel.query.filter(
+        TournamentMatrixModel.tournament_id.in_(user_tournament_ids),
+        TournamentMatrixModel.played == True
+    ).all()
 
     from collections import defaultdict
     dashboard_data = defaultdict(lambda: {"minutes_played": 0, "practice_minutes": 0})
@@ -539,15 +600,24 @@ def dashboard_minutes():
 @app.route('/dashboard-totals')
 @login_required
 def dashboard_totals():
-    players = PlayerModel.query.order_by(PlayerModel.name).all()
-    from collections import defaultdict
+
+    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
+    
     totals_data = defaultdict(lambda: {"games_played": 0, "practices_attended": 0})
 
     # Initialize all players
     for player in players:
         totals_data[player.name]
 
-    matrix_entries = TournamentMatrixModel.query.filter_by(played=True).all()
+    # Step 1: Get the current user's tournament IDs
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+
+    # Step 2: Filter matrix entries to only those tournaments
+    matrix_entries = TournamentMatrixModel.query.filter(
+    TournamentMatrixModel.tournament_id.in_(user_tournament_ids),
+    TournamentMatrixModel.played == True
+    ).all()
+   
     seen_games = set()
 
     for entry in matrix_entries:
@@ -556,7 +626,8 @@ def dashboard_totals():
             totals_data[entry.player_name.strip()]["games_played"] += 1
             seen_games.add(key)
 
-    practice_registers = PracticeRegisterModel.query.all()
+    practice_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
+
     for reg in practice_registers:
         players_present = [p.strip() for p in reg.players_present.split(',') if p.strip()]
         for p in players_present:
@@ -571,9 +642,19 @@ def dashboard_totals():
 @app.route('/export-minutes-csv')
 @login_required
 def export_minutes_csv():
-    players = PlayerModel.query.order_by(PlayerModel.name).all()
-    registers = PracticeRegisterModel.query.all()
-    matrix_entries = TournamentMatrixModel.query.filter_by(played=True).all()
+
+    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
+
+    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
+
+    # Step 1: Get the current user's tournament IDs
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+
+    # Step 2: Filter matrix entries to only those tournaments
+    matrix_entries = TournamentMatrixModel.query.filter(
+    TournamentMatrixModel.tournament_id.in_(user_tournament_ids),
+    TournamentMatrixModel.played == True
+    ).all()
 
     from collections import defaultdict
     dashboard_data = defaultdict(lambda: {"minutes_played": 0, "practice_minutes": 0})
@@ -610,12 +691,21 @@ def export_minutes_csv():
 @app.route('/export-totals-csv')
 @login_required
 def export_totals_csv():
-    players = PlayerModel.query.order_by(PlayerModel.name).all()
+
+    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
 
     from collections import defaultdict
     totals_data = defaultdict(lambda: {"games_played": 0, "practices_attended": 0})
 
-    matrix_entries = TournamentMatrixModel.query.filter_by(played=True).all()
+    # Step 1: Get the current user's tournament IDs
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+
+    # Step 2: Filter matrix entries to only those tournaments
+    matrix_entries = TournamentMatrixModel.query.filter(
+    TournamentMatrixModel.tournament_id.in_(user_tournament_ids),
+    TournamentMatrixModel.played == True
+    ).all()
+
     seen_games = set()
 
     for entry in matrix_entries:
@@ -652,7 +742,11 @@ def export_totals_csv():
 @app.route('/edit-player/<int:player_id>', methods=['GET', 'POST'])
 @login_required
 def edit_player(player_id):
+
     player = PlayerModel.query.get_or_404(player_id)
+
+    if player.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
 
     if request.method == 'POST':
         # Update player fields
