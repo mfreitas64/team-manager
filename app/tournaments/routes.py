@@ -30,7 +30,7 @@ def manage_tournaments():
         )
         db.session.add(tournament)
         db.session.commit()
-        return redirect(url_for('tournaments.tournaments_detail', open='form'))
+        return redirect(url_for('tournaments.manage_tournaments', open='form'))
 
     open_form = request.args.get('open') == 'form'
     all_tournaments = TournamentModel.query.filter_by(user_id=current_user.id).order_by(TournamentModel.date.desc()).all()
