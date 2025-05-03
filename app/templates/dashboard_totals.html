@@ -7,9 +7,9 @@
 <div class="container text-center">
   <h1 class="mb-4">📊 Player Participation – Statistics in Totals</h1>
 
-  <a href="/export-totals-csv" class="btn btn-outline-success mb-3">⬇️ Export to CSV</a>
-  
-  <canvas id="totalsChart" height="100"></canvas>
+  <a href="{{ url_for('export.export_totals_csv') }}" class="btn btn-outline-success mb-3">⬇️>Export to CSV</a>
+
+    <canvas id="totalsChart" height="100"></canvas>
 
   <div class="table-responsive mt-4">
     <table class="table table-bordered table-striped align-middle">

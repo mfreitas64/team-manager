@@ -79,7 +79,7 @@
           <em>Notes:</em> {{ r.coach_notes }}
         {% endif %}
         <br>
-        <a href="/practice-register/{{ r.id }}/edit" class="btn btn-sm btn-outline-warning mt-2">✏️ Edit</a>
+        <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning mt-2">✏️ Edit</a>
       </li>
     {% endfor %}
   </ul>

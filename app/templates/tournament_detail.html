@@ -30,9 +30,9 @@
   {% endif %}
 
   <div class="mb-4">
-    <a href="/tournament/{{ tournament.id }}/pdf" class="btn btn-secondary btn-sm me-2" target="_blank">📄 Download PDF</a>
-    <a href="/tournament/{{ tournament.id }}/export/csv" class="btn btn-success btn-sm me-2">📤 Export CSV</a>
-    <a href="/tournament/{{ tournament.id }}/edit" class="btn btn-warning btn-sm">✏️ Edit Tournament</a>
+    <a href="{{ url_for('export.generate_tournament_pdf', tournament_id=tournament.id) }}" class="btn btn-secondary btn-sm me-2" target="_blank">PDF</a>
+    <a href="{{ url_for('export.export_tournament_csv', tournament_id=tournament.id) }}" class="btn btn-success btn-sm me-2">CSV</a>
+    <a href="{{ url_for('tournaments.edit_tournament', tournament_id=tournament.id) }}" class="btn btn-warning btn-sm">✏️ Edit Tournament</a>
   </div>
 
   <form method="post">

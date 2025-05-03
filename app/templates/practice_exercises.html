@@ -61,9 +61,7 @@
                 {% endif %}
               {% endfor %}
             </div>
-
-            <a href="/practice-exercise/{{ e.id }}/edit" class="btn btn-outline-warning btn-sm mt-2">✏️ Edit</a>
-
+            <a href="{{ url_for('practise.edit_practice_exercise', exercise_id=e.id) }}" class="btn btn-outline-warning btn-sm mt-2">✏️ Edit</a>
             <p class="text-muted mt-2 mb-0" style="font-size: 0.9em;">
               Created: {{ e.creation_date.strftime('%Y-%m-%d') }}
             </p>

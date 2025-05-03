@@ -31,7 +31,7 @@
         <div class="card-body">
           <h5 class="card-title">📋 Practice Register</h5>
           <p class="card-text">Record attendance and linked exercises for practices.</p>
-          <a href="/practice-register" class="btn btn-primary">Go to Practice Register</a>
+          <a href="practise/practice-register" class="btn btn-primary">Go to Practice Register</a>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
         <div class="card-body">
           <h5 class="card-title">🏋️‍♂️ Practice Exercises</h5>
           <p class="card-text">Log drills and training plans with images and categories.</p>
-          <a href="/practice-exercises" class="btn btn-primary">Go to Practices</a>
+          <a href="practise/practice-exercises" class="btn btn-primary">Go to Practices</a>
         </div>
       </div>
     </div>
@@ -53,7 +53,7 @@
         <div class="card-body">
           <h5 class="card-title">📅 Tournaments</h5>
           <p class="card-text">Plan and track tournaments, players, rotations, and stats.</p>
-          <a href="/tournaments" class="btn btn-primary">Go to Tournaments</a>
+          <a href="{{ url_for('tournaments.manage_tournaments') }}" class="btn btn-primary">Go to Tournaments</a>
         </div>
       </div>
     </div>
@@ -65,10 +65,11 @@
           <h5 class="card-title">📊 Dashboard</h5>
           <p class="card-text">View team statistics by minutes or totals.</p>
           <select id="dashboardType" class="form-select form-select-sm mb-2">
-            <option value="/dashboard-minutes" selected>Statistics in Minutes</option>
-            <option value="/dashboard-totals">Statistics in Totals</option>
+            <option value="{{ url_for('dashboard.dashboard_minutes') }}" selected>Statistics in Minutes</option>
+            <option value="{{ url_for('dashboard.dashboard_totals') }}">Statistics in Totals</option>
           </select>
           <button class="btn btn-success btn-sm" onclick="goToDashboard()">Go</button>
+          
         </div>
       </div>
     </div>

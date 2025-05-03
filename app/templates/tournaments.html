@@ -77,10 +77,10 @@
                 <strong>Notes:</strong> <em>{{ t.coach_notes }}</em><br>
               {% endif %}
             </p>
-            <a href="/tournament/{{ t.id }}" class="btn btn-outline-primary btn-sm mb-1">Matrix</a>
-            <a href="/tournament/{{ t.id }}/pdf" class="btn btn-outline-secondary btn-sm mb-1" target="_blank">PDF</a>
-            <a href="/tournament/{{ t.id }}/export/csv" class="btn btn-outline-success btn-sm mb-1">CSV</a>
-            <a href="/tournament/{{ t.id }}/edit" class="btn btn-outline-warning btn-sm mb-1">Edit</a>
+            <a href="{{ url_for('tournaments.tournament_detail', tournament_id=t.id) }}" class="btn btn-outline-primary btn-sm mb-1">Matrix</a>
+            <a href="{{ url_for('export.generate_tournament_pdf', tournament_id=t.id) }}" class="btn btn-outline-secondary btn-sm mb-1" target="_blank">PDF</a>
+            <a href="{{ url_for('export.export_tournament_csv', tournament_id=t.id) }}" class="btn btn-outline-success btn-sm mb-1">CSV</a>
+            <a href="{{ url_for('tournaments.edit_tournament', tournament_id=t.id) }}" class="btn btn-outline-warning btn-sm mb-1">Edit</a>
           </div>
         </div>
       </div>

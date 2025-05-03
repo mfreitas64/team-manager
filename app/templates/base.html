@@ -28,16 +28,30 @@
     <!-- 🔽 Mobile collapsible content -->
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="/players">Players</a></li>
-        <li class="nav-item"><a class="nav-link" href="/practice-exercises">Practice Exercises</a></li>
-        <li class="nav-item"><a class="nav-link" href="/tournaments">Tournaments</a></li>
-        <li class="nav-item"><a class="nav-link" href="/practice-register">Practice Register</a></li>
-
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('players.manage_players') }}">Players</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('practise.practice_exercises') }}">Practice Exercises</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('tournaments.manage_tournaments') }}">Tournaments</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('practise.practice_register') }}">Practice Register</a>
+        </li>
+      
         {% if not current_user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="/signup">Sign Up</a></li>
-          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.signup') }}">Sign Up</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+          </li>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+          </li>
         {% endif %}
       </ul>
     </div>
