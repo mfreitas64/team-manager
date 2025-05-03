@@ -132,3 +132,18 @@ def update_coach_notes(tournament_id):
     tournament.coach_notes = request.form.get('coach_notes', '')
     db.session.commit()
     return redirect(url_for('tournaments.tournament_detail', tournament_id=tournament_id))
+
+@tournaments_bp.route('/tournament/<int:tournament_id>/delete', methods=['POST'])
+@login_required
+def delete_tournament(tournament_id):
+    tournament = TournamentModel.query.get_or_404(tournament_id)
+
+    if tournament.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
+    # 🧼 First delete all related tournament matrix rows manually
+    TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).delete()
+
+    db.session.delete(tournament)
+    db.session.commit()
+    return redirect(url_for('tournaments.manage_tournaments'))

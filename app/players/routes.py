@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect
 from flask_login import login_required, current_user
 from ..models import PlayerModel  
-from .. import db                 
+from .. import db 
+from flask import url_for                
 
 players_bp = Blueprint('players', __name__, url_prefix='/players')
 
@@ -25,3 +26,16 @@ def manage_players():
 
     all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
     return render_template('players.html', players=all_players)
+
+@players_bp.route('/player/<int:player_id>/delete', methods=['POST'])
+@login_required
+def delete_player(player_id):
+    player = PlayerModel.query.get_or_404(player_id)
+
+    # 🔐 Make sure the player belongs to the logged-in user
+    if player.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
+    db.session.delete(player)
+    db.session.commit()
+    return redirect(url_for('players.manage_players'))

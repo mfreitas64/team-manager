@@ -79,7 +79,13 @@
           <em>Notes:</em> {{ r.coach_notes }}
         {% endif %}
         <br>
-        <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning mt-2">✏️ Edit</a>
+        <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning mt-2">✏️ Edit</a> <form action="{{ url_for('practise.delete_practice_register', register_id=r.id) }}" method="POST" class="d-inline">
+          <button type="submit" class="btn btn-sm btn-outline-danger mt-1"
+                  onclick="return confirm('Delete this register entry?');">
+            🗑 Delete
+          </button>
+        </form>
+        
       </li>
     {% endfor %}
   </ul>

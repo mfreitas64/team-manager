@@ -127,3 +127,28 @@ def edit_practice_exercise(exercise_id):
         return redirect(url_for('practise.practice_exercises'))
 
     return render_template("edit_practice_exercise.html", exercise=exercise)
+
+@practise_bp.route('/practice-exercise/<int:exercise_id>/delete', methods=['POST'])
+@login_required
+def delete_practice_exercise(exercise_id):
+    exercise = PracticeExerciseModel.query.get_or_404(exercise_id)
+
+    # 🔐 Ensure user owns it
+    if exercise.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
+    db.session.delete(exercise)
+    db.session.commit()
+    return redirect(url_for('practise.practice_exercises'))
+
+@practise_bp.route('/practice-register/<int:register_id>/delete', methods=['POST'])
+@login_required
+def delete_practice_register(register_id):
+    register = PracticeRegisterModel.query.get_or_404(register_id)
+
+    if register.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
+    db.session.delete(register)
+    db.session.commit()
+    return redirect(url_for('practise.practice_register'))

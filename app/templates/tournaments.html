@@ -73,7 +73,13 @@
 <a class="btn btn-outline-primary btn-sm mb-1" href="{{ url_for('tournaments.tournament_detail', tournament_id=t.id) }}">Matrix</a>
 <a class="btn btn-outline-secondary btn-sm mb-1" href="{{ url_for('export.generate_tournament_pdf', tournament_id=t.id) }}" target="_blank">PDF</a>
 <a class="btn btn-outline-success btn-sm mb-1" href="{{ url_for('export.export_tournament_csv', tournament_id=t.id) }}">CSV</a>
-<a class="btn btn-outline-warning btn-sm mb-1" href="{{ url_for('tournaments.edit_tournament', tournament_id=t.id) }}">Edit</a>
+<a class="btn btn-outline-warning btn-sm mb-1" href="{{ url_for('tournaments.edit_tournament', tournament_id=t.id) }}">Edit</a> <form action="{{ url_for('tournaments.delete_tournament', tournament_id=t.id) }}" method="POST" class="d-inline">
+  <button type="submit" class="btn btn-sm btn-outline-danger mb-1"
+          onclick="return confirm('Delete this tournament?');">
+    🗑 Delete
+  </button>
+</form>
+
 </div>
 </div>
 </div>

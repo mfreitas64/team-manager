@@ -61,7 +61,13 @@
                 {% endif %}
               {% endfor %}
             </div>
-            <a href="{{ url_for('practise.edit_practice_exercise', exercise_id=e.id) }}" class="btn btn-outline-warning btn-sm mt-2">✏️ Edit</a>
+            <a href="{{ url_for('practise.edit_practice_exercise', exercise_id=e.id) }}" class="btn btn-outline-warning btn-sm mt-2">✏️ Edit</a> <form action="{{ url_for('practise.delete_practice_exercise', exercise_id=e.id) }}" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-outline-danger mt-1"
+                      onclick="return confirm('Delete this exercise?');">
+                🗑 Delete
+              </button>
+            </form>
+            
             <p class="text-muted mt-2 mb-0" style="font-size: 0.9em;">
               Created: {{ e.creation_date.strftime('%Y-%m-%d') }}
             </p>
