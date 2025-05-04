@@ -1,17 +1,23 @@
 from .extensions import db
 from flask_login import UserMixin
+from datetime import datetime
 
 # Database model
 class PlayerModel(db.Model):
+    __tablename__ = 'player_model'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
-    season_year = db.Column(db.String(10), nullable=False)
+    season_id = db.Column(db.Integer, db.ForeignKey('season_model.id'), nullable=False)
+
     name = db.Column(db.String(100), nullable=False)
-    escalao = db.Column(db.String(50), nullable=False)
-    n_carteira = db.Column(db.String(50), nullable=False)
-    dob = db.Column(db.String(20), nullable=False)
+    dob = db.Column(db.Date)
     mobile_phone = db.Column(db.String(20))
-    email = db.Column(db.String(100))
+    email = db.Column(db.String(120))
+    escalao = db.Column(db.String(50))
+    n_carteira = db.Column(db.String(50))
+
+    season = db.relationship('SeasonModel', backref='players')
 
 class PracticeExerciseModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -65,3 +71,31 @@ class UserModel(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+class SeasonModel(db.Model):
+    __tablename__ = 'season_model'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)  # e.g., "2024/2025"
+    year = db.Column(db.String(10))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('UserModel', backref='seasons')
+
+class PlayerSeasonStatsModel(db.Model):
+    __tablename__ = 'player_season_stats'
+
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('player_model.id'), nullable=False)
+    season_id = db.Column(db.Integer, db.ForeignKey('season_model.id'), nullable=False)
+
+    behavior = db.Column(db.Text)
+    technical_skills = db.Column(db.Text)
+    team_relation = db.Column(db.Text)
+    improvement_areas = db.Column(db.Text)
+    height_cm = db.Column(db.Integer)
+    weight_kg = db.Column(db.Integer)
+
+    player = db.relationship('PlayerModel', backref='season_stats')
+    season = db.relationship('SeasonModel', backref='player_stats')
