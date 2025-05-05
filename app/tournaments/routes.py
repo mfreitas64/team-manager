@@ -74,6 +74,7 @@ def tournament_detail(tournament_id):
                     played = request.form.get(field_name) == "on"
                     matrix_entry = TournamentMatrixModel(
                         tournament_id=tournament_id,
+                        user_id=current_user.id,
                         season_id=season_id,
                         player_name=player,
                         opponent_name=opponent,

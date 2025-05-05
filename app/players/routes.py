@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, session
 from flask_login import login_required, current_user
-from ..models import PlayerModel, PlayerSeasonStatsModel  
+from ..models import PlayerModel, PlayerSeasonStatsModel, PracticeRegisterModel, TournamentMatrixModel  
 from .. import db 
 from flask import url_for                
 
@@ -82,3 +82,35 @@ def player_season_stats(player_id):
         return redirect(url_for('players.manage_players'))
 
     return render_template('player_season_stats.html', player=player, stats=stats)
+
+@players_bp.route('/player/<int:player_id>/history')
+@login_required
+def player_history(player_id):
+    player = PlayerModel.query.get_or_404(player_id)
+
+    # 🔐 Make sure player belongs to the user
+    if player.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
+    # ✅ Fetch all seasons for this user/player
+    all_stats = PlayerSeasonStatsModel.query.filter_by(player_id=player_id).all()
+    all_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
+    all_matrix_entries = TournamentMatrixModel.query.filter_by(user_id=current_user.id).filter_by(played=True).all()
+
+    # 🔢 Aggregate stats
+    total_practices = 0
+    for r in all_registers:
+        if r.players_present and player.name in r.players_present:
+            total_practices += 1
+
+    total_games = sum(1 for entry in all_matrix_entries if entry.player_name == player.name)
+
+    # 🧠 Latest stats entry (optional)
+    latest_stats = all_stats[-1] if all_stats else None
+
+    return render_template('player_history.html',
+                           player=player,
+                           stats_entries=all_stats,
+                           total_practices=total_practices,
+                           total_games=total_games,
+                           latest_stats=latest_stats)

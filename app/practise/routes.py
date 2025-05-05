@@ -27,6 +27,7 @@ def practice_register():
 
         register = PracticeRegisterModel(
             user_id=current_user.id,
+            season_id=season_id,
             date=date,
             players_present=players_present,
             exercises_used=exercises_used,

@@ -47,6 +47,7 @@ class TournamentModel(db.Model):
 
 class TournamentMatrixModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False) 
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournament_model.id'), nullable=False)
     player_name = db.Column(db.String(100), nullable=False)
     opponent_name = db.Column(db.String(100), nullable=False)

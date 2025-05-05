@@ -90,6 +90,7 @@
           <a href="{{ url_for('players.player_season_stats', player_id=player.id) }}" class="btn btn-outline-info btn-sm mt-2">
             📊 Players Stats
           </a>
+          <a href="{{ url_for('players.player_history', player_id=player.id) }}" class="btn btn-sm btn-outline-dark">📈 History</a>
         </td>
       </tr>
     {% endfor %}
