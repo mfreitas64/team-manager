@@ -87,6 +87,9 @@
               🗑 Delete
             </button>
           </form>
+          <a href="{{ url_for('players.player_season_stats', player_id=player.id) }}" class="btn btn-outline-info btn-sm mt-2">
+            📊 Players Stats
+          </a>
         </td>
       </tr>
     {% endfor %}

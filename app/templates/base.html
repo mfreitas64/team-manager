@@ -40,22 +40,7 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('practise.practice_register') }}">Practice Register</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('season.manage_seasons') }}">Seasons</a>
-        </li>
-
-        {% if current_user.is_authenticated %}
-          <form action="{{ url_for('season.set_season') }}" method="POST" class="d-flex align-items-center me-3">
-            <select name="season_id" class="form-select form-select-sm me-2" onchange="this.form.submit()">
-              {% for s in current_user.seasons %}
-                <option value="{{ s.id }}" {% if session.get('season_id') == s.id %}selected{% endif %}>
-                  {{ s.name }}
-                </option>
-              {% endfor %}
-            </select>
-          </form>
-        {% endif %}
-
+        
         {% if not current_user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('auth.signup') }}">Sign Up</a>

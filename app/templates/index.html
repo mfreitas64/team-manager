@@ -68,12 +68,21 @@
             <option value="{{ url_for('dashboard.dashboard_minutes') }}" selected>Statistics in Minutes</option>
             <option value="{{ url_for('dashboard.dashboard_totals') }}">Statistics in Totals</option>
           </select>
-          <button class="btn btn-success btn-sm" onclick="goToDashboard()">Go</button>
-          
+          <button class="btn btn-success btn-sm" onclick="goToDashboard()">Go</button>         
         </div>
       </div>
     </div>
 
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100 border-warning">
+        <div class="card-body">
+          <h5 class="card-title">📆 Seasons</h5>
+          <p class="card-text">Create and manage seasons. Switch between them to isolate your data.</p>
+          <a href="{{ url_for('season.manage_seasons', open='form') }}" class="btn btn-warning">Go to Seasons</a>
+        </div>
+      </div>
+    </div>
+       
   </div>
 </div>
 
