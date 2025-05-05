@@ -6,6 +6,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from collections import defaultdict
 import csv
 from flask import make_response
+from flask import session, url_for, redirect
 
 from app.models import TournamentModel, TournamentMatrixModel, PlayerModel, PracticeRegisterModel
 
@@ -14,10 +15,19 @@ export_bp = Blueprint('export', __name__, url_prefix='/export')
 @export_bp.route('/tournament/<int:tournament_id>/pdf')
 @login_required
 def generate_tournament_pdf(tournament_id):
+
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
 
     if tournament.user_id != current_user.id:
         return "⛔ Unauthorized", 403
+    
+    season_id = session.get('season_id')
+    if tournament.season_id != season_id:
+        return "⛔ Tournament is not in current season", 403
 
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=landscape(A4))
@@ -91,10 +101,19 @@ def generate_tournament_pdf(tournament_id):
 @export_bp.route('/tournament/<int:tournament_id>/export/csv')
 @login_required
 def export_tournament_csv(tournament_id):
+
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
 
     if tournament.user_id != current_user.id:
         return "⛔ Unauthorized", 403
+    
+    season_id = session.get('season_id')
+    if tournament.season_id != season_id:
+        return "⛔ Tournament is not in current season", 403
 
     matrix_entries = TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).all()
 
@@ -126,10 +145,15 @@ def export_tournament_csv(tournament_id):
 @export_bp.route('/minutes/csv')
 @login_required
 def export_minutes_csv():
-    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
-    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
 
-    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+
+    players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(PlayerModel.name).all()
+    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()]
     matrix_entries = TournamentMatrixModel.query.filter(
         TournamentMatrixModel.tournament_id.in_(user_tournament_ids),
         TournamentMatrixModel.played == True
@@ -169,11 +193,15 @@ def export_minutes_csv():
 @export_bp.route('/totals/csv')
 @login_required
 def export_totals_csv():
+
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
     
-    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
+    players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(PlayerModel.name).all()
     totals_data = defaultdict(lambda: {"games_played": 0, "practices_attended": 0})
 
-    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()]
     matrix_entries = TournamentMatrixModel.query.filter(
         TournamentMatrixModel.tournament_id.in_(user_tournament_ids),
         TournamentMatrixModel.played == True
@@ -186,7 +214,7 @@ def export_totals_csv():
             totals_data[entry.player_name.strip()]["games_played"] += 1
             seen_games.add(key)
 
-    practice_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
+    practice_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
     for reg in practice_registers:
         players_present = [p.strip() for p in reg.players_present.split(',') if p.strip()]
         for p in players_present:

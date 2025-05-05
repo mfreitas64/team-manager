@@ -2,6 +2,7 @@ from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 from app.models import PlayerModel, PracticeRegisterModel, TournamentModel, TournamentMatrixModel
 from collections import defaultdict
+from flask import session
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -9,12 +10,12 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 @login_required
 def dashboard_minutes():
 
-    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
-    
-    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
+    season_id = session.get('season_id')
+    players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(PlayerModel.name).all()
+    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     # Step 1: Get the current user's tournament IDs
-    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()]
 
     # Step 2: Filter matrix entries to only those tournaments
     matrix_entries = TournamentMatrixModel.query.filter(
@@ -53,8 +54,8 @@ def dashboard_minutes():
 @login_required
 def dashboard_totals():
 
-    players = PlayerModel.query.filter_by(user_id=current_user.id).order_by(PlayerModel.name).all()
-    
+    season_id = session.get('season_id')
+    players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(PlayerModel.name).all()
     totals_data = defaultdict(lambda: {"games_played": 0, "practices_attended": 0})
 
     # Initialize all players
@@ -62,7 +63,7 @@ def dashboard_totals():
         totals_data[player.name]
 
     # Step 1: Get the current user's tournament IDs
-    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id).all()]
+    user_tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()]
 
     # Step 2: Filter matrix entries to only those tournaments
     matrix_entries = TournamentMatrixModel.query.filter(
@@ -78,7 +79,7 @@ def dashboard_totals():
             totals_data[entry.player_name.strip()]["games_played"] += 1
             seen_games.add(key)
 
-    practice_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
+    practice_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     for reg in practice_registers:
         players_present = [p.strip() for p in reg.players_present.split(',') if p.strip()]

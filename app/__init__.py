@@ -43,4 +43,7 @@ def create_app():
     from .exports.routes import export_bp
     app.register_blueprint(export_bp)
 
+    from .season.routes import season_bp
+    app.register_blueprint(season_bp)
+
     return app

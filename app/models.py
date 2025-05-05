@@ -1,6 +1,6 @@
 from .extensions import db
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Database model
 class PlayerModel(db.Model):
@@ -30,6 +30,8 @@ class PracticeExerciseModel(db.Model):
     image3 = db.Column(db.String(255))
     image4 = db.Column(db.String(255))
     creation_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    season_id = db.Column(db.Integer, db.ForeignKey('season_model.id'), nullable=False)
+    season = db.relationship('SeasonModel', backref='practice_exercises')
 
 class TournamentModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +42,8 @@ class TournamentModel(db.Model):
     opponents = db.Column(db.Text)  # comma-separated opponent names
     players = db.Column(db.Text)    # comma-separated player names
     coach_notes = db.Column(db.Text)  # Add this line
+    season_id = db.Column(db.Integer, db.ForeignKey('season_model.id'), nullable=False)
+    season = db.relationship('SeasonModel', backref='tournaments')
 
 class TournamentMatrixModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -48,6 +52,8 @@ class TournamentMatrixModel(db.Model):
     opponent_name = db.Column(db.String(100), nullable=False)
     period = db.Column(db.Integer, nullable=False)  # 1 to 4
     played = db.Column(db.Boolean, default=False)
+    season_id = db.Column(db.Integer, db.ForeignKey('season_model.id'), nullable=False)
+    season = db.relationship('SeasonModel', backref='matrix_entries')
 
 class PracticeRegisterModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -57,6 +63,8 @@ class PracticeRegisterModel(db.Model):
     exercises_used = db.Column(db.Text)   # comma-separated exercise IDs
     coach_notes = db.Column(db.Text)
     duration_minutes = db.Column(db.Integer)
+    season_id = db.Column(db.Integer, db.ForeignKey('season_model.id'), nullable=False)
+    season = db.relationship('SeasonModel', backref='practice_registers')
 
 class UserModel(db.Model, UserMixin):
     __tablename__ = 'user_model'  # Add this line!

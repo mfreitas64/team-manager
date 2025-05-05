@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, session
 from flask_login import login_required, current_user
 from app.models import TournamentModel, TournamentMatrixModel, PlayerModel
 from app.extensions import db
@@ -10,7 +10,12 @@ tournaments_bp = Blueprint('tournaments', __name__, url_prefix='/tournament')
 @login_required
 def manage_tournaments():
 
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
+    season_id=session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+    
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':
         opponents = [
@@ -19,8 +24,11 @@ def manage_tournaments():
         ]
         selected_players = request.form.getlist('players')
 
+        season_id = session.get('season_id')
+
         tournament = TournamentModel(
             user_id=current_user.id,
+            season_id=season_id,
             date=request.form['date'],
             place=request.form['place'],
             team_name=request.form['team_name'],
@@ -33,25 +41,31 @@ def manage_tournaments():
         return redirect(url_for('tournaments.manage_tournaments', open='form'))
 
     open_form = request.args.get('open') == 'form'
-    all_tournaments = TournamentModel.query.filter_by(user_id=current_user.id).order_by(TournamentModel.date.desc()).all()
+    all_tournaments = TournamentModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(TournamentModel.date.desc()).all()  
     return render_template('tournaments.html', tournaments=all_tournaments, players=all_players, open_form=open_form)
 
 @tournaments_bp.route('/<int:tournament_id>', methods=['GET', 'POST'])
 @login_required
 def tournament_detail(tournament_id):
 
-    tournament = TournamentModel.query.get_or_404(tournament_id)
+    season_id=session.get('season_id')
 
-    if tournament.user_id != current_user.id:
-        return "⛔ Unauthorized", 403
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
     
+    tournament = TournamentModel.query.get_or_404(tournament_id)
+    
+    # 🔐 Prevent editing others' data
+    if tournament.user_id != current_user.id or tournament.season_id != season_id:
+        return "⛔️ Unauthorized", 403
+ 
     players = [p.strip() for p in tournament.players.split(',') if p.strip()]
     opponents = [op.strip() for op in tournament.opponents.split(',') if op.strip()]
     periods = [1, 2, 3, 4]
 
     if request.method == 'POST':
         # Clear previous matrix entries for this tournament
-        TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).delete()
+        TournamentMatrixModel.query.filter_by(tournament_id=tournament_id, season_id=season_id).delete()
 
         for opponent in opponents:
             for period in periods:
@@ -60,6 +74,7 @@ def tournament_detail(tournament_id):
                     played = request.form.get(field_name) == "on"
                     matrix_entry = TournamentMatrixModel(
                         tournament_id=tournament_id,
+                        season_id=season_id,
                         player_name=player,
                         opponent_name=opponent,
                         period=period,
@@ -73,13 +88,13 @@ def tournament_detail(tournament_id):
     # Preload existing matrix data
     existing_matrix = {
         f"{m.opponent_name}_{m.period}_{m.player_name}".replace(" ", "_"): m.played
-        for m in TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).all()
+        for m in TournamentMatrixModel.query.filter_by(tournament_id=tournament_id, season_id=season_id).all()
     }
 
     # Stats summary
     from collections import defaultdict
     stats = defaultdict(int)
-    for entry in TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).all():
+    for entry in TournamentMatrixModel.query.filter_by(tournament_id=tournament_id, season_id=season_id).all():
         if entry.played:
             stats[entry.player_name.strip()] += 6  # 6 minutes per period
 
@@ -95,12 +110,18 @@ def tournament_detail(tournament_id):
 @login_required
 def edit_tournament(tournament_id):
 
+    season_id=session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+    
     tournament = TournamentModel.query.get_or_404(tournament_id)
 
-    if tournament.user_id != current_user.id:
-        return "⛔ Unauthorized", 403
-
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
+    # 🔐 Prevent editing others' data
+    if tournament.user_id != current_user.id or tournament.season_id != season_id:
+        return "⛔️ Unauthorized", 403
+    
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':
         tournament.date = request.form['date']
@@ -124,11 +145,18 @@ def edit_tournament(tournament_id):
 @tournaments_bp.route('/<int:tournament_id>/edit-notes', methods=['POST'])
 @login_required
 def update_coach_notes(tournament_id):
+
+    season_id=session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
 
-    if tournament.user_id != current_user.id:
-        return "⛔ Unauthorized", 403
-    
+      # 🔐 Prevent editing others' data
+    if tournament.user_id != current_user.id or tournament.season_id != season_id:
+        return "⛔️ Unauthorized", 403         
+   
     tournament.coach_notes = request.form.get('coach_notes', '')
     db.session.commit()
     return redirect(url_for('tournaments.tournament_detail', tournament_id=tournament_id))
@@ -136,13 +164,19 @@ def update_coach_notes(tournament_id):
 @tournaments_bp.route('/tournament/<int:tournament_id>/delete', methods=['POST'])
 @login_required
 def delete_tournament(tournament_id):
+
+    season_id = session.get('season_id')
+    
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
     tournament = TournamentModel.query.get_or_404(tournament_id)
 
-    if tournament.user_id != current_user.id:
+    if tournament.user_id != current_user.id or tournament.season_id != season_id:
         return "⛔ Unauthorized", 403
 
     # 🧼 First delete all related tournament matrix rows manually
-    TournamentMatrixModel.query.filter_by(tournament_id=tournament_id).delete()
+    TournamentMatrixModel.query.filter_by(tournament_id=tournament_id, season_id=season_id).delete()
 
     db.session.delete(tournament)
     db.session.commit()

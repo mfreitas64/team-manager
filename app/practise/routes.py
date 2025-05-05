@@ -1,8 +1,7 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_required, current_user
 from app import db
 from app.models import PlayerModel, PracticeExerciseModel, PracticeRegisterModel
-from flask import url_for
 from datetime import datetime
 
 practise_bp = Blueprint('practise', __name__, url_prefix='/practise')
@@ -10,8 +9,14 @@ practise_bp = Blueprint('practise', __name__, url_prefix='/practise')
 @practise_bp.route('/practice-register', methods=['GET', 'POST'])
 @login_required
 def practice_register():
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
-    all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id).all()
+
+    season_id=session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+    
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':
         date = request.form['date']
@@ -32,7 +37,7 @@ def practice_register():
         db.session.commit()
         return redirect(url_for('practise.practice_register'))
 
-    past_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).order_by(PracticeRegisterModel.date.desc()).all()
+    past_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(PracticeRegisterModel.date.desc()).all()
     
     exercise_map = {str(e.id): f"{e.category} – {e.execution_description[:40]}..." for e in all_exercises}
 
@@ -51,14 +56,19 @@ def practice_register():
 @login_required
 def edit_practice_register(register_id):
 
+    season_id=session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+    
     register = PracticeRegisterModel.query.get_or_404(register_id)
 
     # 🔐 Prevent editing others' data
-    if register.user_id != current_user.id:
+    if register.user_id != current_user.id or register.season_id != season_id:
         return "⛔️ Unauthorized", 403
 
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id).all()
-    all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id).all()
+    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':
         register.date = request.form['date']
@@ -82,9 +92,17 @@ def edit_practice_register(register_id):
 @practise_bp.route('/practice-exercises', methods=['GET', 'POST'])
 @login_required
 def practice_exercises():
+
+    season_id = session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+    
     if request.method == 'POST':
+        season_id = session.get('season_id')
         new_exercise = PracticeExerciseModel(
             user_id=current_user.id,  # 🔐 associate with current user
+            season_id=season_id,
             category=request.form['category'],
             needed_material=request.form['needed_material'],
             execution_description=request.form['execution_description'],
@@ -101,7 +119,7 @@ def practice_exercises():
     open_form = request.args.get('open') == 'form'
     
     # 🔐 Only show this user's exercises
-    exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id).order_by(PracticeExerciseModel.creation_date.desc()).all()
+    exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(PracticeExerciseModel.creation_date.desc()).all()
 
     return render_template("practice_exercises.html", exercises=exercises, open_form=open_form)
 
@@ -109,12 +127,17 @@ def practice_exercises():
 @login_required
 def edit_practice_exercise(exercise_id):
 
+    season_id = session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
     exercise = PracticeExerciseModel.query.get_or_404(exercise_id)
 
     # 🔐 Prevent editing another user's exercise
-    if exercise.user_id != current_user.id:
+    if exercise.user_id != current_user.id or exercise.season_id != season_id:
         return "⛔️ Unauthorized access", 403
-
+    
     if request.method == 'POST':
         exercise.category = request.form['category']
         exercise.needed_material = request.form['needed_material']
@@ -131,12 +154,18 @@ def edit_practice_exercise(exercise_id):
 @practise_bp.route('/practice-exercise/<int:exercise_id>/delete', methods=['POST'])
 @login_required
 def delete_practice_exercise(exercise_id):
+
+    season_id = session.get('season_id')
+    
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))  # or return a default response
+    
     exercise = PracticeExerciseModel.query.get_or_404(exercise_id)
 
     # 🔐 Ensure user owns it
-    if exercise.user_id != current_user.id:
+    if exercise.user_id != current_user.id or exercise.season_id != season_id:
         return "⛔ Unauthorized", 403
-
+    
     db.session.delete(exercise)
     db.session.commit()
     return redirect(url_for('practise.practice_exercises'))
@@ -144,11 +173,17 @@ def delete_practice_exercise(exercise_id):
 @practise_bp.route('/practice-register/<int:register_id>/delete', methods=['POST'])
 @login_required
 def delete_practice_register(register_id):
+
+    season_id = session.get('season_id')
+    
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+        
     register = PracticeRegisterModel.query.get_or_404(register_id)
 
-    if register.user_id != current_user.id:
+    if register.user_id != current_user.id or register.season_id != season_id:
         return "⛔ Unauthorized", 403
-
+    
     db.session.delete(register)
     db.session.commit()
     return redirect(url_for('practise.practice_register'))
