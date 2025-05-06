@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Home – Team Manager{% endblock %}
+{% block title %}Tournament – {{ tournament.team_name }}{% endblock %}
 
 {% block head %}
 <style>
@@ -18,68 +18,78 @@
 {% endblock %}
 
 {% block content %}
+<div class="card mx-auto" style="max-width: 1000px;">
+  <div class="card-body">
 
-<div class="container">
-  <h2 class="mb-3">{{ tournament.team_name }} – Player Matrix</h2>
-  <p><strong>Date:</strong> {{ tournament.date }} | <strong>Place:</strong> {{ tournament.place }}</p>
+    <h2 class="mb-3">{{ tournament.team_name }} – Player Matrix</h2>
+    <p><strong>Date:</strong> {{ tournament.date }} | <strong>Place:</strong> {{ tournament.place }}</p>
 
-  {% if tournament.coach_notes %}
-    <div class="alert alert-info">
-      <strong>Coach Notes:</strong> {{ tournament.coach_notes }}
+    {% if tournament.coach_notes %}
+      <div class="alert alert-info">
+        <strong>Coach Notes:</strong> {{ tournament.coach_notes }}
+      </div>
+    {% endif %}
+
+    <!-- Export + Edit Buttons -->
+    <div class="mb-4 d-flex flex-wrap gap-2">
+      <a href="{{ url_for('export.generate_tournament_pdf', tournament_id=tournament.id) }}" class="btn btn-outline-secondary btn-sm" target="_blank">📄 PDF</a>
+      <a href="{{ url_for('export.export_tournament_csv', tournament_id=tournament.id) }}" class="btn btn-outline-success btn-sm">⬇️ CSV</a>
+      <a href="{{ url_for('tournaments.edit_tournament', tournament_id=tournament.id) }}" class="btn btn-outline-warning btn-sm">✏️ Edit Tournament</a>
     </div>
-  {% endif %}
 
-  <div class="mb-4">
-    <a href="{{ url_for('export.generate_tournament_pdf', tournament_id=tournament.id) }}" class="btn btn-secondary btn-sm me-2" target="_blank">PDF</a>
-    <a href="{{ url_for('export.export_tournament_csv', tournament_id=tournament.id) }}" class="btn btn-success btn-sm me-2">CSV</a>
-    <a href="{{ url_for('tournaments.edit_tournament', tournament_id=tournament.id) }}" class="btn btn-warning btn-sm">✏️ Edit Tournament</a>
-  </div>
-
-  <form method="post">
-    <div class="table-responsive">
-      <table class="table table-bordered align-middle">
-        <thead class="table-light sticky-top">
-          <tr>
-            <th>Player</th>
-            {% for opponent in opponents %}
-              {% for period in periods %}
-                <th>{{ opponent }}<br>P{{ period }}</th>
-              {% endfor %}
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for player in players %}
+    <!-- Player Matrix Table -->
+    <form method="post">
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light sticky-top">
             <tr>
-              <td class="text-start">{{ player }}</td>
+              <th>Player</th>
               {% for opponent in opponents %}
                 {% for period in periods %}
-                  {% set key = (opponent ~ "_" ~ period ~ "_" ~ player).replace(" ", "_") %}
-                  <td>
-                    <input class="form-check-input" type="checkbox" name="{{ key }}" {% if matrix.get(key) %}checked{% endif %}>
-                  </td>
+                  <th>{{ opponent }}<br>P{{ period }}</th>
                 {% endfor %}
               {% endfor %}
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <button type="submit" class="btn btn-primary mt-3">💾 Save Matrix</button>
-  </form>
+          </thead>
+          <tbody>
+            {% for player in players %}
+              <tr>
+                <td class="text-start">{{ player }}</td>
+                {% for opponent in opponents %}
+                  {% for period in periods %}
+                    {% set key = (opponent ~ "_" ~ period ~ "_" ~ player).replace(" ", "_") %}
+                    <td>
+                      <input class="form-check-input" type="checkbox" name="{{ key }}" {% if matrix.get(key) %}checked{% endif %}>
+                    </td>
+                  {% endfor %}
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
-  {% if stats %}
-    <hr>
-    <h5 class="mt-4">🧮 Player Minutes Summary</h5>
-    <ul class="list-group">
-      {% for player, minutes in stats.items() %}
-        <li class="list-group-item d-flex justify-content-between">
-          <strong>{{ player }}</strong>
-          <span>{{ minutes }} min</span>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+      <!-- Save Button -->
+      <div class="d-grid d-md-flex justify-content-md-end mt-3">
+        <button type="submit" class="btn btn-primary">💾 Save Matrix</button>
+      </div>
+    </form>
+
+    <!-- Summary Stats -->
+    {% if stats %}
+      <hr>
+      <h5 class="mt-4">🧮 Player Minutes Summary</h5>
+      <ul class="list-group">
+        {% for player, minutes in stats.items() %}
+          <li class="list-group-item d-flex justify-content-between">
+            <strong>{{ player }}</strong>
+            <span>{{ minutes }} min</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+  </div>
 </div>
 {% endblock %}
 

@@ -3,40 +3,48 @@
 {% block title %}Home – Team Manager{% endblock %}
 
 {% block content %}
-
-<div class="container text-center">
-  <h1 class="mb-4">📊 Player Participation – Statistics in Minutes</h1>
-
-  <a href="{{ url_for('export.export_minutes_csv') }}" class="btn btn-outline-success mb-3">⬇️>Export to CSV</a>
-
-  <!-- Chart -->
-  <div class="table-responsive">
-    <canvas id="playerChart" height="100"></canvas>
+<div class="card">
+  <div class="card-header text-center">
+    📊 Player Participation – Statistics in Minutes
   </div>
+  <div class="card-body">
 
-  <!-- Table -->
-  <div class="table-responsive mt-4">
-    <table class="table table-bordered table-striped align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>Player</th>
-          <th>Time Played (min)</th>
-          <th>Practice Time (min)</th>
-          <th>Total Minutes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for player in players %}
-          {% set stats = data.get(player.name, {'minutes_played': 0, 'practice_minutes': 0}) %}
+    <div class="d-flex justify-content-end mb-3">
+      <a href="{{ url_for('export.export_minutes_csv') }}" class="btn btn-outline-success">
+        ⬇️ Export to CSV
+      </a>
+    </div>
+
+    <!-- Chart -->
+    <div class="table-responsive mb-4">
+      <canvas id="playerChart" height="100"></canvas>
+    </div>
+
+    <!-- Stats Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped align-middle text-center">
+        <thead class="table-light">
           <tr>
-            <td>{{ player.name }}</td>
-            <td>{{ stats.minutes_played }}</td>
-            <td>{{ stats.practice_minutes }}</td>
-            <td>{{ stats.minutes_played + stats.practice_minutes }}</td>
+            <th>Player</th>
+            <th>Time Played (min)</th>
+            <th>Practice Time (min)</th>
+            <th>Total Minutes</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for player in players %}
+            {% set stats = data.get(player.name, {'minutes_played': 0, 'practice_minutes': 0}) %}
+            <tr>
+              <td>{{ player.name }}</td>
+              <td>{{ stats.minutes_played }}</td>
+              <td>{{ stats.practice_minutes }}</td>
+              <td>{{ stats.minutes_played + stats.practice_minutes }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>
 {% endblock %}
@@ -64,6 +72,7 @@
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top' },
         title: { display: true, text: 'Participation by Player' }
@@ -75,6 +84,4 @@
     }
   });
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

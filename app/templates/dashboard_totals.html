@@ -3,36 +3,48 @@
 {% block title %}Home – Team Manager{% endblock %}
 
 {% block content %}
+<div class="card">
+  <div class="card-header text-center">
+    📊 Player Participation – Statistics in Totals
+  </div>
+  <div class="card-body">
 
-<div class="container text-center">
-  <h1 class="mb-4">📊 Player Participation – Statistics in Totals</h1>
+    <div class="d-flex justify-content-end mb-3">
+      <a href="{{ url_for('export.export_totals_csv') }}" class="btn btn-outline-success">
+        ⬇️ Export to CSV
+      </a>
+    </div>
 
-  <a href="{{ url_for('export.export_totals_csv') }}" class="btn btn-outline-success mb-3">⬇️>Export to CSV</a>
+    <!-- Chart Section -->
+    <div class="table-responsive mb-4">
+      <canvas id="totalsChart" height="100"></canvas>
+    </div>
 
-    <canvas id="totalsChart" height="100"></canvas>
-
-  <div class="table-responsive mt-4">
-    <table class="table table-bordered table-striped align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>Player</th>
-          <th>Games Played</th>
-          <th>Practices Attended</th>
-          <th>Total Activities</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for player in players %}
-          {% set totals = totals_data.get(player.name, {'games_played': 0, 'practices_attended': 0}) %}
+    <!-- Data Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped align-middle text-center">
+        <thead class="table-light">
           <tr>
-            <td>{{ player.name }}</td>
-            <td>{{ totals.games_played }}</td>
-            <td>{{ totals.practices_attended }}</td>
-            <td>{{ totals.games_played + totals.practices_attended }}</td>
+            <th>Player</th>
+            <th>Games Played</th>
+            <th>Practices Attended</th>
+            <th>Total Activities</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for player in players %}
+            {% set totals = totals_data.get(player.name, {'games_played': 0, 'practices_attended': 0}) %}
+            <tr>
+              <td>{{ player.name }}</td>
+              <td>{{ totals.games_played }}</td>
+              <td>{{ totals.practices_attended }}</td>
+              <td>{{ totals.games_played + totals.practices_attended }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>
 {% endblock %}
@@ -68,6 +80,7 @@
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top' },
         title: { display: true, text: 'Games and Practices by Player' }
@@ -79,7 +92,4 @@
     }
   });
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 {% endblock %}

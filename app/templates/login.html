@@ -1,25 +1,33 @@
 {% extends 'base.html' %}
 
-{% block title %}Home – Team Manager{% endblock %}
+{% block title %}Login – Team Manager{% endblock %}
 
 {% block content %}
+<div class="card mx-auto mt-5 shadow-sm" style="max-width: 500px;">
+  <div class="card-header text-center">
+    🔐 Login to Your Account
+  </div>
+  <div class="card-body">
+    <form method="POST" class="row g-3">
 
-<div class="container mt-5">
-  <h2>Login</h2>
-  <form method="POST" class="row g-3">
-    <div class="col-md-6">
-      <label for="email" class="form-label">Email</label>
-      <input type="email" name="email" class="form-control" required>
-    </div>
-    <div class="col-md-6">
-      <label for="password" class="form-label">Password</label>
-      <input type="password" name="password" class="form-control" required>
-    </div>
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary">Login</button>
-      <a href="/signup" class="btn btn-link">Don't have an account? Sign up</a>
-    </div>
-  </form>
+      <!-- Email Field -->
+      <div class="col-12">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+
+      <!-- Password Field -->
+      <div class="col-12">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="col-12 d-grid gap-2">
+        <button type="submit" class="btn btn-primary">🔓 Login</button>
+        <a href="/signup" class="btn btn-link">Don't have an account? Sign up</a>
+      </div>
+    </form>
+  </div>
 </div>
-
 {% endblock %}

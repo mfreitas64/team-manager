@@ -1,65 +1,78 @@
 {% extends 'base.html' %}
-{% block title %}Player History{% endblock %}
+{% block title %}Player History – {{ player.name }}{% endblock %}
 
 {% block content %}
-<h3>📊 Season History — {{ player.name }}</h3>
+<div class="card mx-auto" style="max-width: 900px;">
+  <div class="card-header text-center">
+    📊 Season History — {{ player.name }}
+  </div>
+  <div class="card-body">
 
-<div class="row mb-4">
-  <div class="col-md-6">
-    <div class="card text-center border-success">
-      <div class="card-body">
-        <h5 class="card-title">🏀 Games Played</h5>
-        <p class="display-5">{{ total_games }}</p>
+    <!-- Stat Cards -->
+    <div class="row mb-4">
+      <div class="col-md-6 mb-3 mb-md-0">
+        <div class="card border-success text-center h-100">
+          <div class="card-body">
+            <h5 class="card-title">🏀 Games Played</h5>
+            <p class="display-5">{{ total_games }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-primary text-center h-100">
+          <div class="card-body">
+            <h5 class="card-title">📅 Practices Attended</h5>
+            <p class="display-5">{{ total_practices }}</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-md-6">
-    <div class="card text-center border-primary">
-      <div class="card-body">
-        <h5 class="card-title">📅 Practices Attended</h5>
-        <p class="display-5">{{ total_practices }}</p>
+
+    <!-- Chart -->
+    <div class="mb-4">
+      <canvas id="historyChart"></canvas>
+    </div>
+
+    <!-- Season Stats Table -->
+    <div class="card">
+      <div class="card-header fw-bold">🧠 Seasonal Evaluations</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Season</th>
+              <th>Behavior</th>
+              <th>Technical Skills</th>
+              <th>Team Relation</th>
+              <th>Improvement Areas</th>
+              <th>Height (cm)</th>
+              <th>Weight (kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in stats_entries %}
+              <tr>
+                <td>{{ s.season.name }}</td>
+                <td>{{ s.behavior or '-' }}</td>
+                <td>{{ s.technical_skills or '-' }}</td>
+                <td>{{ s.team_relation or '-' }}</td>
+                <td>{{ s.improvement_areas or '-' }}</td>
+                <td>{{ s.height_cm or '-' }}</td>
+                <td>{{ s.weight_kg or '-' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
+
+    <!-- Back Button -->
+    <div class="mt-3 text-end">
+      <a href="{{ url_for('players.manage_players') }}" class="btn btn-outline-secondary">← Back to Players</a>
+    </div>
+
   </div>
 </div>
-
-<!-- 🟦 Bar Chart -->
-<canvas id="historyChart" class="mb-4"></canvas>
-
-<!-- 🧠 Season Stats Table -->
-<div class="card">
-  <div class="card-header fw-bold">Seasonal Evaluations</div>
-  <div class="table-responsive">
-    <table class="table table-sm align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>Season</th>
-          <th>Behavior</th>
-          <th>Technical Skills</th>
-          <th>Team Relation</th>
-          <th>Improvement Areas</th>
-          <th>Height (cm)</th>
-          <th>Weight (kg)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for s in stats_entries %}
-        <tr>
-          <td>{{ s.season.name }}</td>
-          <td>{{ s.behavior or '-' }}</td>
-          <td>{{ s.technical_skills or '-' }}</td>
-          <td>{{ s.team_relation or '-' }}</td>
-          <td>{{ s.improvement_areas or '-' }}</td>
-          <td>{{ s.height_cm or '-' }}</td>
-          <td>{{ s.weight_kg or '-' }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<a href="{{ url_for('players.manage_players') }}" class="btn btn-secondary mt-3">← Back to Players</a>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

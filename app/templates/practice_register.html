@@ -1,112 +1,118 @@
 {% extends 'base.html' %}
 
-{% block title %}Home – Team Manager{% endblock %}
+{% block title %}Practice Register – Team Manager{% endblock %}
 
 {% block content %}
-
-<div class="container">
-  <!-- Accordion for Practice Register Form -->
-  <div class="card mb-4 border-0 shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center"
-        style="cursor: pointer; background-color: #f4ede4; color: #343a40; font-weight: bold; border-radius: .5rem .5rem 0 0;"
-        onclick="toggleForm()">
-      <span>➕ Practice Register</span>
-      <span id="toggleIcon">▼</span>
-    </div>
-    <div id="formSection" class="card-body {% if not open_form %}d-none{% endif %}">
-      <form method="post" class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Practice Date</label>
-          <input type="date" name="date" class="form-control" required>
-        </div>
-
-        <div class="col-md-3">
-          <label class="form-label">Duration (minutes)</label>
-          <input type="number" name="duration_minutes" class="form-control" min="0" required>
-        </div>        
-
-        <div class="col-12">
-          <label class="form-label">Players Present</label>
-          <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-            {% for player in players %}
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}">
-                <label class="form-check-label">{{ player.name }}</label>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-
-        <div class="col-12">
-          <label class="form-label">Exercises Used</label>
-          <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-            {% for e in exercises %}
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="exercises" value="{{ e.id }}">
-                <label class="form-check-label">{{ e.category }} – {{ e.execution_description[:50] }}...</label>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-
-        <div class="col-12">
-          <label class="form-label">Coach Notes</label>
-          <textarea name="coach_notes" class="form-control" rows="3"></textarea>
-        </div>
-
-        <div class="col-12">
-          <button type="submit" class="btn btn-success">📌 Save Register</button>
-        </div>
-      </form>
-    </div>
+<div class="card mx-auto mb-4" style="max-width: 1000px;">
+  <div class="card-header d-flex justify-content-between align-items-center"
+      style="cursor: pointer; background-color: #f4ede4; color: #343a40; font-weight: bold;"
+      onclick="toggleForm()">
+    <span>➕ Add Practice Register</span>
+    <span id="toggleIcon">▼</span>
   </div>
-  <hr>
-  <h4>Past Practice Logs</h4>
-  <ul class="list-group">
-    {% for r in registers %}
-      <li class="list-group-item">
-        <strong>{{ r.date }}</strong><br>
-        <strong>Duration:</strong> {{ r.duration_minutes }} min<br>
-        <em>Players:</em> {{ r.players_present }}<br>
-        <em>Exercises:</em>
-        <ul>
-            {% for label in r.exercise_labels %}
-                <li>{{ label }}</li>
-            {% endfor %}
-        </ul>
 
-        {% if r.coach_notes %}
-          <em>Notes:</em> {{ r.coach_notes }}
-        {% endif %}
-        <br>
-        <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning mt-2">✏️ Edit</a> <form action="{{ url_for('practise.delete_practice_register', register_id=r.id) }}" method="POST" class="d-inline">
-          <button type="submit" class="btn btn-sm btn-outline-danger mt-1"
+  <div id="formSection" class="card-body {% if not open_form %}d-none{% endif %}">
+    <form method="post" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Practice Date</label>
+        <input type="date" name="date" class="form-control" required>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Duration (minutes)</label>
+        <input type="number" name="duration_minutes" class="form-control" min="0" required>
+      </div>
+
+      <!-- Players Present -->
+      <div class="col-12">
+        <label class="form-label">Players Present</label>
+        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+          <div class="row">
+            {% for player in players %}
+              <div class="col-6 col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}">
+                  <label class="form-check-label">{{ player.name }}</label>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercises Used -->
+      <div class="col-12">
+        <label class="form-label">Exercises Used</label>
+        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+          {% for e in exercises %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="exercises" value="{{ e.id }}">
+              <label class="form-check-label">{{ e.category }} – {{ e.execution_description[:50] }}...</label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Coach Notes -->
+      <div class="col-12">
+        <label class="form-label">Coach Notes</label>
+        <textarea name="coach_notes" class="form-control" rows="3"></textarea>
+      </div>
+
+      <!-- Save Button -->
+      <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="submit" class="btn btn-success">📌 Save Register</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Divider -->
+<hr class="my-4">
+
+<!-- Past Logs -->
+<h4>📚 Past Practice Logs</h4>
+<div class="list-group">
+  {% for r in registers %}
+    <div class="list-group-item">
+      <div class="fw-bold">{{ r.date }}</div>
+      <div><strong>Duration:</strong> {{ r.duration_minutes }} min</div>
+      <div><strong>Players:</strong> {{ r.players_present }}</div>
+      <div><strong>Exercises:</strong>
+        <ul class="mb-1">
+          {% for label in r.exercise_labels %}
+            <li>{{ label }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% if r.coach_notes %}
+        <div><strong>Notes:</strong> {{ r.coach_notes }}</div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="mt-2 d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
+        <form action="{{ url_for('practise.delete_practice_register', register_id=r.id) }}" method="POST" class="d-inline">
+          <button type="submit" class="btn btn-sm btn-outline-danger"
                   onclick="return confirm('Delete this register entry?');">
             🗑 Delete
           </button>
         </form>
-        
-      </li>
-    {% endfor %}
-  </ul>
+      </div>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}
-  
+
 {% block js %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   function toggleForm() {
     const form = document.getElementById('formSection');
     const icon = document.getElementById('toggleIcon');
     const isHidden = form.classList.contains('d-none');
 
-    if (isHidden) {
-      form.classList.remove('d-none');
-      icon.innerText = '▼';
-    } else {
-      form.classList.add('d-none');
-      icon.innerText = '➕';
-    }
+    form.classList.toggle('d-none');
+    icon.innerText = isHidden ? '▼' : '➕';
   }
 
   window.addEventListener('DOMContentLoaded', () => {

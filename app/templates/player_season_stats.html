@@ -1,37 +1,50 @@
 {% extends 'base.html' %}
-{% block title %}Player Season Stats{% endblock %}
+{% block title %}Player Season Stats – {{ player.name }}{% endblock %}
 
 {% block content %}
-<h3>📝 {{ player.name }} — Season Stats</h3>
+<div class="card mx-auto" style="max-width: 800px;">
+  <div class="card-header text-center">
+    📝 {{ player.name }} — Season Stats
+  </div>
+  <div class="card-body">
+    <form method="POST" class="row g-3">
 
-<form method="POST" class="row g-3">
-  <div class="col-md-6">
-    <label class="form-label">Behavior</label>
-    <textarea name="behavior" class="form-control">{{ stats.behavior or '' }}</textarea>
+      <div class="col-md-6">
+        <label class="form-label">Behavior</label>
+        <textarea name="behavior" class="form-control" rows="3">{{ stats.behavior or '' }}</textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Technical Skills</label>
+        <textarea name="technical_skills" class="form-control" rows="3">{{ stats.technical_skills or '' }}</textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Team Relation</label>
+        <textarea name="team_relation" class="form-control" rows="3">{{ stats.team_relation or '' }}</textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Improvement Areas</label>
+        <textarea name="improvement_areas" class="form-control" rows="3">{{ stats.improvement_areas or '' }}</textarea>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Height (cm)</label>
+        <input type="number" name="height_cm" value="{{ stats.height_cm or '' }}" class="form-control">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Weight (kg)</label>
+        <input type="number" name="weight_kg" value="{{ stats.weight_kg or '' }}" class="form-control">
+      </div>
+
+      <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end mt-2">
+        <button class="btn btn-success">💾 Save Stats</button>
+        <a href="{{ url_for('players.manage_players') }}" class="btn btn-outline-secondary">← Back</a>
+      </div>
+
+    </form>
   </div>
-  <div class="col-md-6">
-    <label class="form-label">Technical Skills</label>
-    <textarea name="technical_skills" class="form-control">{{ stats.technical_skills or '' }}</textarea>
-  </div>
-  <div class="col-md-6">
-    <label class="form-label">Team Relation</label>
-    <textarea name="team_relation" class="form-control">{{ stats.team_relation or '' }}</textarea>
-  </div>
-  <div class="col-md-6">
-    <label class="form-label">Improvement Areas</label>
-    <textarea name="improvement_areas" class="form-control">{{ stats.improvement_areas or '' }}</textarea>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Height (cm)</label>
-    <input type="number" name="height_cm" value="{{ stats.height_cm or '' }}" class="form-control">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Weight (kg)</label>
-    <input type="number" name="weight_kg" value="{{ stats.weight_kg or '' }}" class="form-control">
-  </div>
-  <div class="col-12">
-    <button class="btn btn-success">Save Stats</button>
-    <a href="{{ url_for('players.manage_players') }}" class="btn btn-secondary">Back</a>
-  </div>
-</form>
+</div>
 {% endblock %}
