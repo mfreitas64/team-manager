@@ -9,18 +9,19 @@
   </div>
   <div class="card-body">
 
+    <!-- Export Button -->
     <div class="d-flex justify-content-end mb-3">
       <a href="{{ url_for('export.export_totals_csv') }}" class="btn btn-outline-success">
         ⬇️ Export to CSV
       </a>
     </div>
 
-    <!-- Chart Section -->
-    <div class="table-responsive mb-4">
-      <canvas id="totalsChart" height="100"></canvas>
+    <!-- Chart Container -->
+    <div class="mb-4" style="position: relative; height: 300px;">
+      <canvas id="totalsChart"></canvas>
     </div>
 
-    <!-- Data Table -->
+    <!-- Stats Table -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle text-center">
         <thead class="table-light">
@@ -50,46 +51,60 @@
 {% endblock %}
 
 {% block js %}
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-  const ctx = document.getElementById('totalsChart').getContext('2d');
-  const totalsChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: {{ players | map(attribute='name') | list | tojson | safe }},
-      datasets: [
-        {
-          label: 'Games Played',
-          backgroundColor: '#0d6efd',
-          data: [
-            {% for player in players %}
-              {{ totals_data.get(player.name, {}).get('games_played', 0) }},
-            {% endfor %}
-          ]
-        },
-        {
-          label: 'Practices Attended',
-          backgroundColor: '#ffc107',
-          data: [
-            {% for player in players %}
-              {{ totals_data.get(player.name, {}).get('practices_attended', 0) }},
-            {% endfor %}
-          ]
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Games and Practices by Player' }
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('totalsChart').getContext('2d');
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: {{ players | map(attribute='name') | list | tojson | safe }},
+        datasets: [
+          {
+            label: 'Games Played',
+            backgroundColor: '#0d6efd',
+            data: [
+              {% for player in players %}
+                {{ totals_data.get(player.name, {}).get('games_played', 0) }},
+              {% endfor %}
+            ]
+          },
+          {
+            label: 'Practices Attended',
+            backgroundColor: '#ffc107',
+            data: [
+              {% for player in players %}
+                {{ totals_data.get(player.name, {}).get('practices_attended', 0) }},
+              {% endfor %}
+            ]
+          }
+        ]
       },
-      scales: {
-        x: { stacked: true },
-        y: { stacked: true, beginAtZero: true }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' },
+          title: {
+            display: true,
+            text: 'Games and Practices by Player'
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: { autoSkip: false }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true
+          }
+        }
       }
-    }
+    });
   });
 </script>
 {% endblock %}

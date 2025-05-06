@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, session
 from flask_login import login_required, current_user
-from ..models import PlayerModel, PlayerSeasonStatsModel, PracticeRegisterModel, TournamentMatrixModel  
+from ..models import PlayerModel, PlayerSeasonStatsModel, PracticeRegisterModel, TournamentMatrixModel, SeasonModel  
 from .. import db 
 from flask import url_for                
 
@@ -32,6 +32,31 @@ def manage_players():
 
     all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
     return render_template('players.html', players=all_players)
+
+from app.models import SeasonModel  # or whatever your season model is called
+
+@players_bp.route('/edit-player/<int:player_id>', methods=['GET', 'POST'])
+@login_required
+def edit_player(player_id):
+    player = PlayerModel.query.get_or_404(player_id)
+
+    if player.user_id != current_user.id:
+        return "⛔ Unauthorized", 403
+
+    # Get season info if available
+    season = SeasonModel.query.get(player.season_id)  # assuming the field is `season_id`
+
+    if request.method == 'POST':
+        player.name = request.form['name'].strip()
+        player.escalao = request.form['escalao']
+        player.n_carteira = request.form['n_carteira']
+        player.dob = request.form['dob']
+        player.mobile_phone = request.form['mobile_phone']
+        player.email = request.form['email']
+        db.session.commit()
+        return redirect('/players')
+
+    return render_template('edit_player.html', player=player, season=season)
 
 @players_bp.route('/player/<int:player_id>/delete', methods=['POST'])
 @login_required

@@ -3,23 +3,27 @@
 {% block title %}Edit Player – Team Manager{% endblock %}
 
 {% block content %}
-<div class="card mx-auto" style="max-width: 700px;">
+
+<div class="card mx-auto mt-4" style="max-width: 800px;">
   <div class="card-header text-center">
     ✏️ Edit Player
   </div>
   <div class="card-body">
     <form method="post" class="row g-3">
-      <div class="col-md-4">
-        <label class="form-label">Season Year</label>
-        <input name="season_year" class="form-control" value="{{ player.season_year }}" required>
-      </div>
 
-      <div class="col-md-8">
+      {% if season %}
+      <div class="col-md-6 offset-md-1">
+        <label class="form-label">Current Season</label>
+        <input class="form-control" value="{{ season.name }}" disabled>
+      </div>
+      {% endif %}
+
+      <div class="col-md-8 offset-md-1">
         <label class="form-label">Player Name</label>
         <input name="name" class="form-control" value="{{ player.name }}" required>
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-4 offset-md-1">
         <label class="form-label">Escalão</label>
         <input name="escalao" class="form-control" value="{{ player.escalao }}">
       </div>
@@ -34,12 +38,12 @@
         <input type="date" name="dob" class="form-control" value="{{ player.dob }}">
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-6 offset-md-1">
         <label class="form-label">Mobile Phone</label>
         <input name="mobile_phone" class="form-control" value="{{ player.mobile_phone }}">
       </div>
 
-      <div class="col-md-6">
+      <div class="col-md-5">
         <label class="form-label">Email</label>
         <input name="email" class="form-control" value="{{ player.email }}">
       </div>
@@ -48,7 +52,9 @@
         <button type="submit" class="btn btn-success">💾 Save Changes</button>
         <a href="/players" class="btn btn-outline-secondary">⬅️ Cancel</a>
       </div>
+
     </form>
   </div>
 </div>
-{% endblock % }
+
+{% endblock %}
