@@ -2,24 +2,25 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from flask_login import login_required, current_user
 from app import db
 from app.models import PlayerModel, PracticeExerciseModel, PracticeRegisterModel
-from datetime import datetime
+from datetime import datetime, timedelta
 
 practise_bp = Blueprint('practise', __name__, url_prefix='/practise')
 
 @practise_bp.route('/practice-register', methods=['GET', 'POST'])
 @login_required
 def practice_register():
-
-    season_id=session.get('season_id')
+    
+    season_id = session.get('season_id')
 
     if not season_id:
-        return redirect(url_for('season.manage_seasons'))  # or return a default response
-    
+        return redirect(url_for('season.manage_seasons'))
+
     all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
     all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':
-        date = request.form['date']
+        date_str = request.form['date']
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
         notes = request.form.get('coach_notes', '')
         players_present = ','.join(request.form.getlist('players'))
         exercises_used = ','.join(request.form.getlist('exercises'))
@@ -28,7 +29,7 @@ def practice_register():
         register = PracticeRegisterModel(
             user_id=current_user.id,
             season_id=season_id,
-            date=date,
+            date=date_obj,
             players_present=players_present,
             exercises_used=exercises_used,
             coach_notes=notes,
@@ -38,8 +39,23 @@ def practice_register():
         db.session.commit()
         return redirect(url_for('practise.practice_register'))
 
-    past_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(PracticeRegisterModel.date.desc()).all()
-    
+    # 📅 Filter by from_date or default to 2 weeks ago
+    filter_date_str = request.args.get('from_date')
+    if filter_date_str:
+        try:
+            from_date = datetime.strptime(filter_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            from_date = datetime.today().date() - timedelta(weeks=2)
+    else:
+        from_date = datetime.today().date() - timedelta(weeks=2)
+
+    past_registers = PracticeRegisterModel.query.filter(
+        PracticeRegisterModel.user_id == current_user.id,
+        PracticeRegisterModel.season_id == season_id,
+        PracticeRegisterModel.date >= from_date
+    ).order_by(PracticeRegisterModel.date.desc()).all()
+
+    # 🧠 Build exercise labels
     exercise_map = {str(e.id): f"{e.category} – {e.execution_description[:40]}..." for e in all_exercises}
 
     for r in past_registers:
@@ -48,10 +64,13 @@ def practice_register():
         else:
             r.exercise_labels = []
 
-    return render_template('practice_register.html',
-                           players=all_players,
-                           exercises=all_exercises,
-                           registers=past_registers)
+    return render_template(
+        'practice_register.html',
+        players=all_players,
+        exercises=all_exercises,
+        registers=past_registers,
+        from_date=filter_date_str  # 👈 important for form value
+    )
 
 @practise_bp.route('/practice-register/<int:register_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -72,7 +91,8 @@ def edit_practice_register(register_id):
     all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':
-        register.date = request.form['date']
+        date_str = request.form['date']
+        register.date = datetime.strptime(date_str, '%Y-%m-%d').date()
         register.players_present = ','.join(request.form.getlist('players'))
         register.exercises_used = ','.join(request.form.getlist('exercises'))
         register.coach_notes = request.form.get('coach_notes', '')

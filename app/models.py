@@ -1,6 +1,7 @@
 from .extensions import db
 from flask_login import UserMixin
 from datetime import datetime, timezone
+from sqlalchemy import Date
 
 # Database model
 class PlayerModel(db.Model):
@@ -59,7 +60,7 @@ class TournamentMatrixModel(db.Model):
 class PracticeRegisterModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'))
-    date = db.Column(db.String(20), nullable=False)
+    date = db.Column(Date, nullable=False)
     players_present = db.Column(db.Text)  # comma-separated player names
     exercises_used = db.Column(db.Text)   # comma-separated exercise IDs
     coach_notes = db.Column(db.Text)

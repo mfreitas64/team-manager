@@ -23,7 +23,6 @@
         <input type="number" name="duration_minutes" class="form-control" min="0" required>
       </div>
 
-      <!-- Players Present -->
       <div class="col-12">
         <label class="form-label">Players Present</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
@@ -40,7 +39,6 @@
         </div>
       </div>
 
-      <!-- Exercises Used -->
       <div class="col-12">
         <label class="form-label">Exercises Used</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
@@ -53,13 +51,11 @@
         </div>
       </div>
 
-      <!-- Coach Notes -->
       <div class="col-12">
         <label class="form-label">Coach Notes</label>
         <textarea name="coach_notes" class="form-control" rows="3"></textarea>
       </div>
 
-      <!-- Save Button -->
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
         <button type="submit" class="btn btn-success">📌 Save Register</button>
       </div>
@@ -67,14 +63,25 @@
   </div>
 </div>
 
-<!-- Divider -->
-<hr class="my-4">
+<!-- Date Filter -->
+<form method="get" class="row g-2 align-items-end mb-4" style="max-width: 600px;">
+  <div class="col-md-6">
+    <label for="from_date" class="form-label">Show practices from:</label>
+    <input type="date" id="from_date" name="from_date" class="form-control" value="{{ from_date }}">
+  </div>
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-primary w-100">Filter</button>
+  </div>
+  <div class="col-md-3">
+    <a href="{{ url_for('practise.practice_register') }}" class="btn btn-secondary w-100">Reset</a>
+  </div>
+</form>
 
-<!-- Past Logs -->
+<!-- Past Practice Logs -->
 <h4>📚 Past Practice Logs</h4>
 <div class="list-group">
   {% for r in registers %}
-    <div class="list-group-item">
+    <div class="list-group-item mb-3">
       <div class="fw-bold">{{ r.date }}</div>
       <div><strong>Duration:</strong> {{ r.duration_minutes }} min</div>
       <div><strong>Players:</strong> {{ r.players_present }}</div>
@@ -89,7 +96,6 @@
         <div><strong>Notes:</strong> {{ r.coach_notes }}</div>
       {% endif %}
 
-      <!-- Action Buttons -->
       <div class="mt-2 d-flex gap-2 flex-wrap">
         <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
         <form action="{{ url_for('practise.delete_practice_register', register_id=r.id) }}" method="POST" class="d-inline">
