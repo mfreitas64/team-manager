@@ -18,7 +18,6 @@ def manage_players():
         new_player = PlayerModel(
             user_id=current_user.id,
             season_id=season_id,
-            season_year=request.form['season_year'],
             name=request.form['name'],
             escalao=request.form['escalao'],
             n_carteira=request.form['n_carteira'],
