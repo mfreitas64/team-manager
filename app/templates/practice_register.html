@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 
-{% block title %}Practice Register – Team Manager{% endblock %}
+{% block title %}{{ _('Practice Register') }} – Team Manager{% endblock %}
 
 {% block content %}
 <div class="card mx-auto mb-4" style="max-width: 1000px;">
   <div class="card-header d-flex justify-content-between align-items-center"
       style="cursor: pointer; background-color: #f4ede4; color: #343a40; font-weight: bold;"
       onclick="toggleForm()">
-    <span>➕ Add Practice Register</span>
+    <span>➕ {{ _('Add Practice Register') }}</span>
     <span id="toggleIcon">▼</span>
   </div>
 
   <div id="formSection" class="card-body {% if not open_form %}d-none{% endif %}">
     <form method="post" class="row g-3">
       <div class="col-md-4">
-        <label class="form-label">Practice Date</label>
+        <label class="form-label">{{ _('Practice Date') }}</label>
         <input type="date" name="date" class="form-control" required>
       </div>
 
       <div class="col-md-3">
-        <label class="form-label">Duration (minutes)</label>
+        <label class="form-label">{{ _('Duration (minutes)') }}</label>
         <input type="number" name="duration_minutes" class="form-control" min="0" required>
       </div>
 
       <div class="col-12">
-        <label class="form-label">Players Present</label>
+        <label class="form-label">{{ _('Players Present') }}</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
           <div class="row">
             {% for player in players %}
@@ -40,7 +40,7 @@
       </div>
 
       <div class="col-12">
-        <label class="form-label">Exercises Used</label>
+        <label class="form-label">{{ _('Exercises Used') }}</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
           {% for e in exercises %}
             <div class="form-check">
@@ -52,12 +52,12 @@
       </div>
 
       <div class="col-12">
-        <label class="form-label">Coach Notes</label>
+        <label class="form-label">{{ _('Coach Notes') }}</label>
         <textarea name="coach_notes" class="form-control" rows="3"></textarea>
       </div>
 
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-success">📌 Save Register</button>
+        <button type="submit" class="btn btn-success">📌 {{ _('Save Register') }}</button>
       </div>
     </form>
   </div>
@@ -66,26 +66,26 @@
 <!-- Date Filter -->
 <form method="get" class="row g-2 align-items-end mb-4" style="max-width: 600px;">
   <div class="col-md-6">
-    <label for="from_date" class="form-label">Show practices from:</label>
+    <label for="from_date" class="form-label">{{ _('Show practices from:') }}</label>
     <input type="date" id="from_date" name="from_date" class="form-control" value="{{ from_date }}">
   </div>
   <div class="col-md-3">
-    <button type="submit" class="btn btn-primary w-100">Filter</button>
+    <button type="submit" class="btn btn-primary w-100">{{ _('Filter') }}</button>
   </div>
   <div class="col-md-3">
-    <a href="{{ url_for('practise.practice_register') }}" class="btn btn-secondary w-100">Reset</a>
+    <a href="{{ url_for('practise.practice_register') }}" class="btn btn-secondary w-100">{{ _('Reset') }}</a>
   </div>
 </form>
 
 <!-- Past Practice Logs -->
-<h4>📚 Past Practice Logs</h4>
+<h4>📚 {{ _('Past Practice Logs') }}</h4>
 <div class="list-group">
   {% for r in registers %}
     <div class="list-group-item mb-3">
       <div class="fw-bold">{{ r.date }}</div>
-      <div><strong>Duration:</strong> {{ r.duration_minutes }} min</div>
-      <div><strong>Players:</strong> {{ r.players_present }}</div>
-      <div><strong>Exercises:</strong>
+      <div><strong>{{ _('Duration:') }}</strong> {{ r.duration_minutes }} {{ _('min') }}</div>
+      <div><strong>{{ _('Players:') }}</strong> {{ r.players_present }}</div>
+      <div><strong>{{ _('Exercises:') }}</strong>
         <ul class="mb-1">
           {% for label in r.exercise_labels %}
             <li>{{ label }}</li>
@@ -93,15 +93,15 @@
         </ul>
       </div>
       {% if r.coach_notes %}
-        <div><strong>Notes:</strong> {{ r.coach_notes }}</div>
+        <div><strong>{{ _('Notes:') }}</strong> {{ r.coach_notes }}</div>
       {% endif %}
 
       <div class="mt-2 d-flex gap-2 flex-wrap">
-        <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
+        <a href="{{ url_for('practise.edit_practice_register', register_id=r.id) }}" class="btn btn-sm btn-outline-warning">✏️ {{ _('Edit') }}</a>
         <form action="{{ url_for('practise.delete_practice_register', register_id=r.id) }}" method="POST" class="d-inline">
           <button type="submit" class="btn btn-sm btn-outline-danger"
-                  onclick="return confirm('Delete this register entry?');">
-            🗑 Delete
+                  onclick="return confirm('{{ _('Delete this register entry?') }}');">
+            🗑 {{ _('Delete') }}
           </button>
         </form>
       </div>

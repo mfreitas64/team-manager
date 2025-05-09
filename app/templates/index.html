@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Home – Team Manager{% endblock %}
+{% block title %}{{ _('Home – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="container text-center" style="max-width: 1100px;">
-  <h1 class="mb-3">🏀 Welcome to Your Team Manager</h1>
-  <p class="lead">Your all-in-one toolkit for managing players, practices, and tournaments</p>
+  <h1 class="mb-3">🏀 {{ _('Welcome to Your Team Manager') }}</h1>
+  <p class="lead">{{ _('Your all-in-one toolkit for managing players, practices, and tournaments') }}</p>
 
   {% if not current_user.is_authenticated %}
     <div class="alert alert-warning mt-4">
-      <strong>Welcome!</strong> To use this Team Manager system, please <a href="/signup" class="alert-link">sign up</a> for an account.
+      <strong>{{ _('Welcome!') }}</strong> {{ _('To use this Team Manager system, please') }}
+      <a href="/signup" class="alert-link">{{ _('sign up') }}</a> {{ _('for an account.') }}
     </div>
   {% endif %}
 
@@ -19,9 +20,9 @@
     <div class="col">
       <div class="card shadow-sm h-100">
         <div class="card-body d-flex flex-column">
-          <h5 class="card-title">👥 Manage Players</h5>
-          <p class="card-text flex-grow-1">Add new players, view your team roster, and update details.</p>
-          <a href="/players" class="btn btn-primary mt-auto">Go to Players</a>
+          <h5 class="card-title">👥 {{ _('Manage Players') }}</h5>
+          <p class="card-text flex-grow-1">{{ _('Add new players, view your team roster, and update details.') }}</p>
+          <a href="/players" class="btn btn-primary mt-auto">{{ _('Go to Players') }}</a>
         </div>
       </div>
     </div>
@@ -30,9 +31,9 @@
     <div class="col">
       <div class="card shadow-sm h-100">
         <div class="card-body d-flex flex-column">
-          <h5 class="card-title">📋 Practice Register</h5>
-          <p class="card-text flex-grow-1">Record attendance and linked exercises for practices.</p>
-          <a href="/practise/practice-register" class="btn btn-primary mt-auto">Go to Practice Register</a>
+          <h5 class="card-title">📋 {{ _('Practice Register') }}</h5>
+          <p class="card-text flex-grow-1">{{ _('Record attendance and linked exercises for practices.') }}</p>
+          <a href="/practise/practice-register" class="btn btn-primary mt-auto">{{ _('Go to Practice Register') }}</a>
         </div>
       </div>
     </div>
@@ -41,9 +42,9 @@
     <div class="col">
       <div class="card shadow-sm h-100">
         <div class="card-body d-flex flex-column">
-          <h5 class="card-title">🏋️‍♂️ Practice Exercises</h5>
-          <p class="card-text flex-grow-1">Log drills and training plans with images and categories.</p>
-          <a href="/practise/practice-exercises" class="btn btn-primary mt-auto">Go to Practices</a>
+          <h5 class="card-title">🏋️‍♂️ {{ _('Practice Exercises') }}</h5>
+          <p class="card-text flex-grow-1">{{ _('Log drills and training plans with images and categories.') }}</p>
+          <a href="/practise/practice-exercises" class="btn btn-primary mt-auto">{{ _('Go to Practices') }}</a>
         </div>
       </div>
     </div>
@@ -52,9 +53,9 @@
     <div class="col">
       <div class="card shadow-sm h-100">
         <div class="card-body d-flex flex-column">
-          <h5 class="card-title">📅 Tournaments</h5>
-          <p class="card-text flex-grow-1">Plan and track tournaments, players, rotations, and stats.</p>
-          <a href="{{ url_for('tournaments.manage_tournaments') }}" class="btn btn-primary mt-auto">Go to Tournaments</a>
+          <h5 class="card-title">📅 {{ _('Tournaments') }}</h5>
+          <p class="card-text flex-grow-1">{{ _('Plan and track tournaments, players, rotations, and stats.') }}</p>
+          <a href="{{ url_for('tournaments.manage_tournaments') }}" class="btn btn-primary mt-auto">{{ _('Go to Tournaments') }}</a>
         </div>
       </div>
     </div>
@@ -63,13 +64,13 @@
     <div class="col">
       <div class="card shadow-sm h-100">
         <div class="card-body d-flex flex-column">
-          <h5 class="card-title">📊 Dashboard</h5>
-          <p class="card-text">View team statistics by minutes or totals.</p>
+          <h5 class="card-title">📊 {{ _('Dashboard') }}</h5>
+          <p class="card-text">{{ _('View team statistics by minutes or totals.') }}</p>
           <select id="dashboardType" class="form-select form-select-sm mb-2">
-            <option value="{{ url_for('dashboard.dashboard_minutes') }}" selected>Statistics in Minutes</option>
-            <option value="{{ url_for('dashboard.dashboard_totals') }}">Statistics in Totals</option>
+            <option value="{{ url_for('dashboard.dashboard_minutes') }}" selected>{{ _('Statistics in Minutes') }}</option>
+            <option value="{{ url_for('dashboard.dashboard_totals') }}">{{ _('Statistics in Totals') }}</option>
           </select>
-          <button class="btn btn-success btn-sm mt-auto" onclick="goToDashboard()">Go</button>
+          <button class="btn btn-success btn-sm mt-auto" onclick="goToDashboard()">{{ _('Go') }}</button>
         </div>
       </div>
     </div>
@@ -78,9 +79,9 @@
     <div class="col">
       <div class="card shadow-sm h-100 border-warning">
         <div class="card-body d-flex flex-column">
-          <h5 class="card-title">📆 Seasons</h5>
-          <p class="card-text flex-grow-1">Create and manage seasons. Switch between them to isolate your data.</p>
-          <a href="{{ url_for('season.manage_seasons', open='form') }}" class="btn btn-warning mt-auto">Go to Seasons</a>
+          <h5 class="card-title">📆 {{ _('Seasons') }}</h5>
+          <p class="card-text flex-grow-1">{{ _('Create and manage seasons. Switch between them to isolate your data.') }}</p>
+          <a href="{{ url_for('season.manage_seasons', open='form') }}" class="btn btn-warning mt-auto">{{ _('Go to Seasons') }}</a>
         </div>
       </div>
     </div>
@@ -89,8 +90,8 @@
 </div>
 
 <footer class="bg-dark text-white text-center p-3 mt-5">
-  <p class="mb-0">🏀 Made with passion by Miguel Freitas</p>
-  <small>Team Manager © 2025</small>
+  <p class="mb-0">🏀 {{ _('Made with passion by Miguel Freitas') }}</p>
+  <small>{{ _('Team Manager © 2025') }}</small>
 </footer>
 {% endblock %}
 

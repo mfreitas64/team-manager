@@ -1,33 +1,33 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign Up – Team Manager{% endblock %}
+{% block title %}{{ _('Sign Up – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto mt-5 shadow-sm" style="max-width: 500px;">
   <div class="card-header text-center">
-    🧾 Create Your Account
+    🧾 {{ _('Create Your Account') }}
   </div>
   <div class="card-body">
     <form method="POST" class="row g-3">
 
       <div class="col-12">
-        <label for="username" class="form-label">Username</label>
+        <label for="username" class="form-label">{{ _('Username') }}</label>
         <input type="text" name="username" class="form-control" required>
       </div>
 
       <div class="col-12">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label">{{ _('Email') }}</label>
         <input type="email" name="email" class="form-control" required>
       </div>
 
       <div class="col-12">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label">{{ _('Password') }}</label>
         <input type="password" name="password" class="form-control" required>
       </div>
 
       <div class="col-12 d-grid gap-2">
-        <button type="submit" class="btn btn-success">✅ Sign Up</button>
-        <a href="/login" class="btn btn-link">Already have an account? Log in</a>
+        <button type="submit" class="btn btn-success">✅ {{ _('Sign Up') }}</button>
+        <a href="/login" class="btn btn-link">{{ _('Already have an account? Log in') }}</a>
       </div>
     </form>
   </div>

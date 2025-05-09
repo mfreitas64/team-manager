@@ -1,0 +1,714 @@
+# Portuguese translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-09 02:01+0100\n"
+"PO-Revision-Date: 2025-05-09 02:01+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/templates/base.html:44
+msgid "🏀 Team Manager"
+msgstr "🏀 Gestão de Equipas"
+
+#: app/templates/base.html:51
+msgid "Players"
+msgstr "Jogadores"
+
+#: app/templates/base.html:52 app/templates/index.html:45
+#: app/templates/practice_exercises.html:3
+msgid "Practice Exercises"
+msgstr "Exercícios"
+
+#: app/templates/base.html:53 app/templates/index.html:56
+msgid "Tournaments"
+msgstr "Encontros"
+
+#: app/templates/base.html:54 app/templates/index.html:34
+#: app/templates/practice_register.html:3
+msgid "Practice Register"
+msgstr "Registo dos Treinos"
+
+#: app/templates/base.html:56 app/templates/signup.html:29
+msgid "Sign Up"
+msgstr "Criar conta"
+
+#: app/templates/base.html:57 app/templates/login.html:27
+msgid "Login"
+msgstr "Entrar"
+
+#: app/templates/base.html:59
+msgid "Logout"
+msgstr "Sair"
+
+#: app/templates/base.html:62
+msgid "Profile"
+msgstr "Perfil"
+
+#: app/templates/dashboard.html:3 app/templates/dashboard_minutes.html:3
+#: app/templates/dashboard_totals.html:3 app/templates/index.html:3
+#: app/templates/tournament_detail.html:3
+msgid "Home – Team Manager"
+msgstr "Home – Gesão de Equipas"
+
+#: app/templates/dashboard.html:8
+msgid "Player Dashboard"
+msgstr "Painel de Jogador"
+
+#: app/templates/dashboard.html:12
+msgid "Filter by Player"
+msgstr "Filtro por Jogador"
+
+#: app/templates/dashboard.html:13
+msgid "Type a player's name..."
+msgstr "Digite o nome do jogador"
+
+#: app/templates/dashboard.html:19 app/templates/dashboard_minutes.html:29
+#: app/templates/dashboard_totals.html:29
+#: app/templates/tournament_detail.html:69
+msgid "Player"
+msgstr "Jogador"
+
+#: app/templates/dashboard.html:20 app/templates/dashboard.html:62
+#: app/templates/dashboard_minutes.html:30
+#: app/templates/dashboard_minutes.html:65
+msgid "Time Played (min)"
+msgstr "Tempo jogado (min)"
+
+#: app/templates/dashboard.html:21 app/templates/dashboard.html:67
+#: app/templates/dashboard_minutes.html:31
+#: app/templates/dashboard_minutes.html:70
+msgid "Practice Time (min)"
+msgstr "Tempo de Treino (min)"
+
+#: app/templates/dashboard.html:22 app/templates/dashboard_minutes.html:32
+msgid "Total Minutes"
+msgstr "Total de minutos"
+
+#: app/templates/dashboard.html:79
+msgid "Player Participation Overview"
+msgstr "Participação do jogador"
+
+#: app/templates/dashboard_minutes.html:8
+msgid "Player Participation – Statistics in Minutes"
+msgstr "Participação do jogador - Estatistica em minutos"
+
+#: app/templates/dashboard_minutes.html:15
+#: app/templates/dashboard_totals.html:15
+msgid "Export to CSV"
+msgstr "Exportar para CSV"
+
+#: app/templates/dashboard_minutes.html:83
+msgid "Participation by Player"
+msgstr "Participação por jogador"
+
+#: app/templates/dashboard_totals.html:8
+msgid "Player Participation – Statistics in Totals"
+msgstr "Participação do jogador - Estatistica em Totais"
+
+#: app/templates/dashboard_totals.html:30
+#: app/templates/dashboard_totals.html:65 app/templates/player_history.html:16
+#: app/templates/player_history.html:84
+msgid "Games Played"
+msgstr "Jogos"
+
+#: app/templates/dashboard_totals.html:31
+#: app/templates/dashboard_totals.html:74 app/templates/player_history.html:24
+#: app/templates/player_history.html:84
+msgid "Practices Attended"
+msgstr "Treinos - Assiduidade"
+
+#: app/templates/dashboard_totals.html:32
+msgid "Total Activities"
+msgstr "Total de atividades"
+
+#: app/templates/dashboard_totals.html:91
+msgid "Games and Practices by Player"
+msgstr "Jogos e treinos por jogador"
+
+#: app/templates/edit_player.html:3
+msgid "Edit Player – Team Manager"
+msgstr "Editar jogador - Gestão de Equipas"
+
+#: app/templates/edit_player.html:9
+msgid "Edit Player"
+msgstr "Editar jogador"
+
+#: app/templates/edit_player.html:16
+msgid "Current Season"
+msgstr "Época atual"
+
+#: app/templates/edit_player.html:22
+msgid "Player Name"
+msgstr "Nome do jogador"
+
+#: app/templates/edit_player.html:27 app/templates/players.html:26
+#: app/templates/players.html:66
+msgid "Escalão"
+msgstr "Level"
+
+#: app/templates/edit_player.html:32 app/templates/players.html:31
+msgid "Nº Carteira"
+msgstr "Carteira FPB"
+
+#: app/templates/edit_player.html:37 app/templates/players.html:36
+msgid "Date of Birth"
+msgstr "Data de nascimento"
+
+#: app/templates/edit_player.html:42 app/templates/players.html:41
+msgid "Mobile Phone"
+msgstr "Telemóvel"
+
+#: app/templates/edit_player.html:47 app/templates/login.html:15
+#: app/templates/players.html:46 app/templates/players.html:70
+#: app/templates/signup.html:19
+msgid "Email"
+msgstr "Email"
+
+#: app/templates/edit_player.html:52
+#: app/templates/edit_practice_exercise.html:36
+#: app/templates/edit_practice_register.html:65
+#: app/templates/edit_tournament.html:58
+msgid "Save Changes"
+msgstr "Guardar"
+
+#: app/templates/edit_player.html:53
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: app/templates/edit_practice_exercise.html:3
+msgid "Edit Practice Exercise – Team Manager"
+msgstr "Editar exercício - Gestão de Equipas"
+
+#: app/templates/edit_practice_exercise.html:8
+msgid "Edit Practice Exercise"
+msgstr "Editar Exercício"
+
+#: app/templates/edit_practice_exercise.html:14
+#: app/templates/practice_exercises.html:17
+msgid "Category"
+msgstr "Categoria"
+
+#: app/templates/edit_practice_exercise.html:19
+#: app/templates/practice_exercises.html:22
+msgid "Needed Material"
+msgstr "Material"
+
+#: app/templates/edit_practice_exercise.html:24
+#: app/templates/practice_exercises.html:27
+msgid "Execution Description"
+msgstr "Execução"
+
+#: app/templates/edit_practice_exercise.html:30
+#: app/templates/practice_exercises.html:33
+msgid "Image"
+msgstr "Imagem"
+
+#: app/templates/edit_practice_exercise.html:37
+#: app/templates/edit_practice_register.html:66
+#: app/templates/edit_tournament.html:59
+#: app/templates/player_season_stats.html:44
+msgid "Back"
+msgstr "Voltar"
+
+#: app/templates/edit_practice_register.html:3
+msgid "Edit Practice Register – Team Manager"
+msgstr "Editar treino - Gestão de Equipas"
+
+#: app/templates/edit_practice_register.html:8
+msgid "Edit Practice Register"
+msgstr "Editar treino"
+
+#: app/templates/edit_practice_register.html:14
+#: app/templates/practice_register.html:17
+msgid "Practice Date"
+msgstr "Data do treino"
+
+#: app/templates/edit_practice_register.html:19
+#: app/templates/practice_register.html:22
+msgid "Duration (minutes)"
+msgstr "Duração"
+
+#: app/templates/edit_practice_register.html:28
+#: app/templates/practice_register.html:27
+msgid "Players Present"
+msgstr "Jogadores Presentes"
+
+#: app/templates/edit_practice_register.html:45
+#: app/templates/practice_register.html:43
+msgid "Exercises Used"
+msgstr "Exercícios usados"
+
+#: app/templates/edit_practice_register.html:60
+#: app/templates/edit_tournament.html:53
+#: app/templates/practice_register.html:55 app/templates/tournaments.html:54
+msgid "Coach Notes"
+msgstr "Notas"
+
+#: app/templates/edit_tournament.html:3
+msgid "Edit Tournament – Team Manager"
+msgstr "Editar Encontro - Gestão de Equipas"
+
+#: app/templates/edit_tournament.html:8 app/templates/tournament_detail.html:60
+msgid "Edit Tournament"
+msgstr "Editar Encontros"
+
+#: app/templates/edit_tournament.html:14 app/templates/tournaments.html:18
+msgid "Date"
+msgstr "Data"
+
+#: app/templates/edit_tournament.html:19 app/templates/tournaments.html:22
+msgid "Place"
+msgstr "Local"
+
+#: app/templates/edit_tournament.html:24 app/templates/tournaments.html:26
+msgid "Team Name"
+msgstr "Nome da Equipa"
+
+#: app/templates/edit_tournament.html:30 app/templates/tournaments.html:32
+msgid "Opponent"
+msgstr "Adversário"
+
+#: app/templates/edit_tournament.html:36 app/templates/tournaments.html:38
+msgid "Select Players"
+msgstr "Selecione jogadores"
+
+#: app/templates/index.html:7
+msgid "Welcome to Your Team Manager"
+msgstr "Bem-vindo à sua Gestão de Equipas"
+
+#: app/templates/index.html:8
+msgid "Your all-in-one toolkit for managing players, practices, and tournaments"
+msgstr "O seu kit de ferramentas completo para gerir épocas, equipas, treinos, encontros"
+
+#: app/templates/index.html:12
+msgid "Welcome!"
+msgstr "Bem-vindo"
+
+#: app/templates/index.html:12
+msgid "To use this Team Manager system, please"
+msgstr "Para aceder à aplicação, por favor"
+
+#: app/templates/index.html:13
+msgid "sign up"
+msgstr "Cria uma"
+
+#: app/templates/index.html:13
+msgid "for an account."
+msgstr "conta"
+
+#: app/templates/index.html:23
+msgid "Manage Players"
+msgstr "Gestão de jogadores"
+
+#: app/templates/index.html:24
+msgid "Add new players, view your team roster, and update details."
+msgstr "Adiciona novos jogadores e atualiza os detalhes"
+
+#: app/templates/index.html:25
+msgid "Go to Players"
+msgstr "Ir para Jogadores"
+
+#: app/templates/index.html:35
+msgid "Record attendance and linked exercises for practices."
+msgstr "Assiduidade de treino e exercícios"
+
+#: app/templates/index.html:36
+msgid "Go to Practice Register"
+msgstr "Ir para os Treinos"
+
+#: app/templates/index.html:46
+msgid "Log drills and training plans with images and categories."
+msgstr "Registe exercícios e planos de treino com imagens e categorias."
+
+#: app/templates/index.html:47
+msgid "Go to Practices"
+msgstr "Ir para os Exercícios"
+
+#: app/templates/index.html:57
+msgid "Plan and track tournaments, players, rotations, and stats."
+msgstr "Planeie e siga encontros, jogadores e estatistica"
+
+#: app/templates/index.html:58
+msgid "Go to Tournaments"
+msgstr "Ir para Encontros"
+
+#: app/templates/index.html:67
+msgid "Dashboard"
+msgstr "Painel"
+
+#: app/templates/index.html:68
+msgid "View team statistics by minutes or totals."
+msgstr "Ver estatisticas da equipa por minutos ou totais."
+
+#: app/templates/index.html:70
+msgid "Statistics in Minutes"
+msgstr "Estatisticas em Minutos"
+
+#: app/templates/index.html:71
+msgid "Statistics in Totals"
+msgstr "Estatisticas em Totais"
+
+#: app/templates/index.html:73
+msgid "Go"
+msgstr "Ir"
+
+#: app/templates/index.html:82
+msgid "Seasons"
+msgstr "Épocas"
+
+#: app/templates/index.html:83
+msgid "Create and manage seasons. Switch between them to isolate your data."
+msgstr "Crie e faça a gestão de épocas. Troque entre elas para isolar os dados"
+
+#: app/templates/index.html:84
+msgid "Go to Seasons"
+msgstr "Ir para Épocas"
+
+#: app/templates/index.html:93
+msgid "Made with passion by Miguel Freitas"
+msgstr "Feito com paixão por: MF"
+
+#: app/templates/index.html:94
+msgid "Team Manager © 2025"
+msgstr "Gestão de Equipas © 2025"
+
+#: app/templates/login.html:3
+msgid "Login – Team Manager"
+msgstr "Entrar - Gestão de Equipas"
+
+#: app/templates/login.html:8
+msgid "Login to Your Account"
+msgstr "Entrar na sua conta"
+
+#: app/templates/login.html:21 app/templates/signup.html:24
+msgid "Password"
+msgstr "Palavra-chave"
+
+#: app/templates/login.html:28
+msgid "Don't have an account? Sign up"
+msgstr "Ainda não tem conta? Crie uma agora!"
+
+#: app/templates/manage_seasons.html:2 app/templates/manage_seasons.html:7
+msgid "Manage Seasons"
+msgstr "Gestão de Épocas"
+
+#: app/templates/manage_seasons.html:14
+msgid "Select Active Season:"
+msgstr "Selecione a época Ativa"
+
+#: app/templates/manage_seasons.html:22
+msgid "Set"
+msgstr "Ativa"
+
+#: app/templates/manage_seasons.html:29
+msgid "Season Name (e.g. 2024/2025)"
+msgstr "Época (e.g. 2024/2025)"
+
+#: app/templates/manage_seasons.html:32
+msgid "Year (optional)"
+msgstr "Ano (opcional)"
+
+#: app/templates/manage_seasons.html:35
+msgid "Add"
+msgstr "Adicionar"
+
+#: app/templates/manage_seasons.html:41
+msgid "Copy players from current season"
+msgstr "Copiar jogadores da época ativa"
+
+#: app/templates/manage_seasons.html:55
+msgid "Current"
+msgstr "Atual"
+
+#: app/templates/manage_seasons.html:59
+msgid "No seasons yet. Add one above."
+msgstr "Sem época ainda. Adicione uma em cima"
+
+#: app/templates/player_history.html:2
+msgid "Player History"
+msgstr "Historial do jogador"
+
+#: app/templates/player_history.html:7
+msgid "Season History"
+msgstr "Historial da Época"
+
+#: app/templates/player_history.html:38
+msgid "Seasonal Evaluations"
+msgstr "Avaliações trimestrais"
+
+#: app/templates/player_history.html:43
+msgid "Season"
+msgstr "Época"
+
+#: app/templates/player_history.html:44
+#: app/templates/player_season_stats.html:13
+msgid "Behavior"
+msgstr "Comportamento"
+
+#: app/templates/player_history.html:45
+#: app/templates/player_season_stats.html:18
+msgid "Technical Skills"
+msgstr "Capacidades técnicas"
+
+#: app/templates/player_history.html:46
+#: app/templates/player_season_stats.html:23
+msgid "Team Relation"
+msgstr "Relação com a equipa"
+
+#: app/templates/player_history.html:47
+#: app/templates/player_season_stats.html:28
+msgid "Improvement Areas"
+msgstr "Áreas a melhorar"
+
+#: app/templates/player_history.html:48
+#: app/templates/player_season_stats.html:33
+msgid "Height (cm)"
+msgstr "Altura"
+
+#: app/templates/player_history.html:49
+#: app/templates/player_season_stats.html:38
+msgid "Weight (kg)"
+msgstr "Peso"
+
+#: app/templates/player_history.html:71
+msgid "Back to Players"
+msgstr "Voltar jogadores"
+
+#: app/templates/player_history.html:96
+msgid "Participation Summary"
+msgstr "Sumário de participação"
+
+#: app/templates/player_season_stats.html:2
+msgid "Player Season Stats"
+msgstr "Estatistica época do jogador"
+
+#: app/templates/player_season_stats.html:7
+msgid "Season Stats"
+msgstr "Estatisticas da Época"
+
+#: app/templates/player_season_stats.html:43
+msgid "Save Stats"
+msgstr "Salvar Stats"
+
+#: app/templates/players.html:2 app/templates/players.html:59
+msgid "Team Roster"
+msgstr "Capitão"
+
+#: app/templates/players.html:9
+msgid "Add New Player"
+msgstr "Adicionar jogador"
+
+#: app/templates/players.html:16
+msgid "Season Year"
+msgstr "Época Ano"
+
+#: app/templates/players.html:21 app/templates/players.html:65
+msgid "Name"
+msgstr "Nome"
+
+#: app/templates/players.html:51
+msgid "Add Player"
+msgstr "Adicionar jogador"
+
+#: app/templates/players.html:67
+msgid "Carteira"
+msgstr "Carteira"
+
+#: app/templates/players.html:68
+msgid "DOB"
+msgstr "Data de nascimento"
+
+#: app/templates/players.html:69
+msgid "Phone"
+msgstr "Telemóvel"
+
+#: app/templates/players.html:71
+msgid "Actions"
+msgstr "Ações"
+
+#: app/templates/players.html:84 app/templates/practice_exercises.html:64
+#: app/templates/practice_register.html:100 app/templates/tournaments.html:88
+msgid "Edit"
+msgstr "Editar"
+
+#: app/templates/players.html:87
+msgid "Are you sure you want to delete this player?"
+msgstr "Tem a certeza que quer apagar este jogador?"
+
+#: app/templates/players.html:88 app/templates/practice_exercises.html:67
+#: app/templates/practice_register.html:104 app/templates/tournaments.html:92
+msgid "Delete"
+msgstr "Apagar"
+
+#: app/templates/players.html:92
+msgid "Stats"
+msgstr "Stats"
+
+#: app/templates/players.html:95
+msgid "History"
+msgstr "Histórico"
+
+#: app/templates/practice_exercises.html:10
+msgid "Add Practice Exercise"
+msgstr "Adicionar Exercício"
+
+#: app/templates/practice_exercises.html:33
+msgid "URL or path"
+msgstr "URL ou caminho"
+
+#: app/templates/practice_exercises.html:39
+msgid "Add Exercise"
+msgstr "Adicionar Exercício"
+
+#: app/templates/practice_exercises.html:45
+msgid "All Exercises"
+msgstr "Todos os exercícios"
+
+#: app/templates/practice_exercises.html:52
+msgid "Material"
+msgstr "Material"
+
+#: app/templates/practice_exercises.html:58
+msgid "Exercise Image"
+msgstr "Imagem de exercício"
+
+#: app/templates/practice_exercises.html:67
+msgid "Delete this exercise?"
+msgstr "Apagar este exercício"
+
+#: app/templates/practice_exercises.html:72
+msgid "Created"
+msgstr "Criado"
+
+#: app/templates/practice_register.html:10
+msgid "Add Practice Register"
+msgstr "Adicionar Treino"
+
+#: app/templates/practice_register.html:60
+msgid "Save Register"
+msgstr "Salvar treino"
+
+#: app/templates/practice_register.html:69
+msgid "Show practices from:"
+msgstr "Mostrar treinos desde:"
+
+#: app/templates/practice_register.html:73
+msgid "Filter"
+msgstr "Filtro"
+
+#: app/templates/practice_register.html:76
+msgid "Reset"
+msgstr "Reset"
+
+#: app/templates/practice_register.html:81
+msgid "Past Practice Logs"
+msgstr "Log de treinos passados"
+
+#: app/templates/practice_register.html:86
+msgid "Duration:"
+msgstr "Duração"
+
+#: app/templates/practice_register.html:86
+#: app/templates/tournament_detail.html:106
+msgid "min"
+msgstr "min"
+
+#: app/templates/practice_register.html:87 app/templates/tournaments.html:77
+msgid "Players:"
+msgstr "Jogadores:"
+
+#: app/templates/practice_register.html:88
+msgid "Exercises:"
+msgstr "Exercícios"
+
+#: app/templates/practice_register.html:96 app/templates/tournaments.html:79
+msgid "Notes:"
+msgstr "Notas"
+
+#: app/templates/practice_register.html:103
+msgid "Delete this register entry?"
+msgstr "Apagar este treino"
+
+#: app/templates/signup.html:3
+msgid "Sign Up – Team Manager"
+msgstr "Criar conta - Gestão de Equipas"
+
+#: app/templates/signup.html:8
+msgid "Create Your Account"
+msgstr "Crie a sua conta"
+
+#: app/templates/signup.html:14
+msgid "Username"
+msgstr "Nome de utilizador"
+
+#: app/templates/signup.html:30
+msgid "Already have an account? Log in"
+msgstr "Já tem uma conta? Entrar"
+
+#: app/templates/tournament_detail.html:47
+msgid "Player Matrix"
+msgstr "Matrix jogador"
+
+#: app/templates/tournament_detail.html:48 app/templates/tournaments.html:74
+msgid "Date:"
+msgstr "Data:"
+
+#: app/templates/tournament_detail.html:48 app/templates/tournaments.html:75
+msgid "Place:"
+msgstr "Local:"
+
+#: app/templates/tournament_detail.html:52
+msgid "Coach Notes:"
+msgstr "Notas:"
+
+#: app/templates/tournament_detail.html:72
+msgid "P"
+msgstr "P"
+
+#: app/templates/tournament_detail.html:95
+msgid "Save Matrix"
+msgstr "Salvar Matrix"
+
+#: app/templates/tournament_detail.html:101
+msgid "Player Minutes Summary"
+msgstr "Sumário minutos por jogador"
+
+#: app/templates/tournaments.html:3
+msgid "Tournaments – Team Manager"
+msgstr "Encontros - Gestão de Equipas"
+
+#: app/templates/tournaments.html:12
+msgid "Add Tournament"
+msgstr "Adicionar Encontros"
+
+#: app/templates/tournaments.html:59
+msgid "Create Tournament"
+msgstr "Criar Encontros"
+
+#: app/templates/tournaments.html:66
+msgid "Saved Tournaments"
+msgstr "Salvar Encontros"
+
+#: app/templates/tournaments.html:76
+msgid "Opponents:"
+msgstr "Adversários"
+
+#: app/templates/tournaments.html:85
+msgid "Matrix"
+msgstr "Matrix"
+
+#: app/templates/tournaments.html:91
+msgid "Delete this tournament?"
+msgstr "Apagar este Encontro?"

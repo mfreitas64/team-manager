@@ -1,47 +1,47 @@
 {% extends 'base.html' %}
-{% block title %}Player Season Stats – {{ player.name }}{% endblock %}
+{% block title %}{{ _('Player Season Stats') }} – {{ player.name }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto" style="max-width: 800px;">
   <div class="card-header text-center">
-    📝 {{ player.name }} — Season Stats
+    📝 {{ player.name }} — {{ _('Season Stats') }}
   </div>
   <div class="card-body">
     <form method="POST" class="row g-3">
 
       <div class="col-md-6">
-        <label class="form-label">Behavior</label>
+        <label class="form-label">{{ _('Behavior') }}</label>
         <textarea name="behavior" class="form-control" rows="3">{{ stats.behavior or '' }}</textarea>
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">Technical Skills</label>
+        <label class="form-label">{{ _('Technical Skills') }}</label>
         <textarea name="technical_skills" class="form-control" rows="3">{{ stats.technical_skills or '' }}</textarea>
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">Team Relation</label>
+        <label class="form-label">{{ _('Team Relation') }}</label>
         <textarea name="team_relation" class="form-control" rows="3">{{ stats.team_relation or '' }}</textarea>
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">Improvement Areas</label>
+        <label class="form-label">{{ _('Improvement Areas') }}</label>
         <textarea name="improvement_areas" class="form-control" rows="3">{{ stats.improvement_areas or '' }}</textarea>
       </div>
 
       <div class="col-md-3">
-        <label class="form-label">Height (cm)</label>
+        <label class="form-label">{{ _('Height (cm)') }}</label>
         <input type="number" name="height_cm" value="{{ stats.height_cm or '' }}" class="form-control">
       </div>
 
       <div class="col-md-3">
-        <label class="form-label">Weight (kg)</label>
+        <label class="form-label">{{ _('Weight (kg)') }}</label>
         <input type="number" name="weight_kg" value="{{ stats.weight_kg or '' }}" class="form-control">
       </div>
 
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-        <button class="btn btn-success">💾 Save Stats</button>
-        <a href="{{ url_for('players.manage_players') }}" class="btn btn-outline-secondary">← Back</a>
+        <button class="btn btn-success">💾 {{ _('Save Stats') }}</button>
+        <a href="{{ url_for('players.manage_players') }}" class="btn btn-outline-secondary">← {{ _('Back') }}</a>
       </div>
 
     </form>

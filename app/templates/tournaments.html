@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Tournaments – Team Manager{% endblock %}
+{% block title %}{{ _('Tournaments – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -9,33 +9,33 @@
     <div class="card-header d-flex justify-content-between align-items-center"
          onclick="toggleForm()"
          style="cursor: pointer; background-color: #f4ede4; color: #343a40; font-weight: bold;">
-      <span>➕ Add Tournament</span>
+      <span>➕ {{ _('Add Tournament') }}</span>
       <span id="toggleIcon">▼</span>
     </div>
     <div class="card-body {% if not open_form %}d-none{% endif %}" id="formSection">
       <form method="post" class="row g-3">
         <div class="col-md-4">
-          <label class="form-label">Date</label>
+          <label class="form-label">{{ _('Date') }}</label>
           <input class="form-control" name="date" type="date" required>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Place</label>
+          <label class="form-label">{{ _('Place') }}</label>
           <input class="form-control" name="place" required>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Team Name</label>
+          <label class="form-label">{{ _('Team Name') }}</label>
           <input class="form-control" name="team_name" required>
         </div>
 
         {% for i in range(1, 7) %}
           <div class="col-md-4">
-            <label class="form-label">Opponent {{ i }}</label>
+            <label class="form-label">{{ _('Opponent') }} {{ i }}</label>
             <input class="form-control" name="opponent{{ i }}">
           </div>
         {% endfor %}
 
         <div class="col-12">
-          <label class="form-label">Select Players</label>
+          <label class="form-label">{{ _('Select Players') }}</label>
           <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
             <div class="row">
               {% for player in players %}
@@ -51,19 +51,19 @@
         </div>
 
         <div class="col-12">
-          <label class="form-label">Coach Notes</label>
+          <label class="form-label">{{ _('Coach Notes') }}</label>
           <textarea class="form-control" name="coach_notes" rows="3"></textarea>
         </div>
 
         <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
-          <button class="btn btn-success" type="submit">🏆 Create Tournament</button>
+          <button class="btn btn-success" type="submit">🏆 {{ _('Create Tournament') }}</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Tournament List -->
-  <h4 class="mb-3">📋 Saved Tournaments</h4>
+  <h4 class="mb-3">📋 {{ _('Saved Tournaments') }}</h4>
   <div class="row">
     {% for t in tournaments %}
       <div class="col-12 col-md-6 col-lg-4 mb-4">
@@ -71,25 +71,25 @@
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ t.team_name }}</h5>
             <p class="card-text">
-              <strong>Date:</strong> {{ t.date }}<br>
-              <strong>Place:</strong> {{ t.place }}<br>
-              <strong>Opponents:</strong> {{ t.opponents }}<br>
-              <strong>Players:</strong> {{ t.players }}<br>
+              <strong>{{ _('Date:') }}</strong> {{ t.date }}<br>
+              <strong>{{ _('Place:') }}</strong> {{ t.place }}<br>
+              <strong>{{ _('Opponents:') }}</strong> {{ t.opponents }}<br>
+              <strong>{{ _('Players:') }}</strong> {{ t.players }}<br>
               {% if t.coach_notes %}
-                <strong>Notes:</strong> <em>{{ t.coach_notes }}</em><br>
+                <strong>{{ _('Notes:') }}</strong> <em>{{ t.coach_notes }}</em><br>
               {% endif %}
             </p>
 
             <!-- Actions -->
             <div class="d-flex flex-wrap gap-2 mt-auto">
-              <a class="btn btn-outline-primary btn-sm" href="{{ url_for('tournaments.tournament_detail', tournament_id=t.id) }}">📊 Matrix</a>
+              <a class="btn btn-outline-primary btn-sm" href="{{ url_for('tournaments.tournament_detail', tournament_id=t.id) }}">📊 {{ _('Matrix') }}</a>
               <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('export.generate_tournament_pdf', tournament_id=t.id) }}" target="_blank">📄 PDF</a>
               <a class="btn btn-outline-success btn-sm" href="{{ url_for('export.export_tournament_csv', tournament_id=t.id) }}">⬇️ CSV</a>
-              <a class="btn btn-outline-warning btn-sm" href="{{ url_for('tournaments.edit_tournament', tournament_id=t.id) }}">✏️ Edit</a>
+              <a class="btn btn-outline-warning btn-sm" href="{{ url_for('tournaments.edit_tournament', tournament_id=t.id) }}">✏️ {{ _('Edit') }}</a>
               <form action="{{ url_for('tournaments.delete_tournament', tournament_id=t.id) }}" method="POST" class="d-inline">
                 <button type="submit" class="btn btn-outline-danger btn-sm"
-                        onclick="return confirm('Delete this tournament?');">
-                  🗑 Delete
+                        onclick="return confirm('{{ _('Delete this tournament?') }}');">
+                  🗑 {{ _('Delete') }}
                 </button>
               </form>
             </div>

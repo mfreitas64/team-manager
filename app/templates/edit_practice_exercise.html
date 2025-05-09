@@ -1,40 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Practice Exercise – Team Manager{% endblock %}
+{% block title %}{{ _('Edit Practice Exercise – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto" style="max-width: 700px;">
   <div class="card-header text-center">
-    ✏️ Edit Practice Exercise
+    ✏️ {{ _('Edit Practice Exercise') }}
   </div>
   <div class="card-body">
     <form method="post" class="row g-3">
 
       <div class="col-md-4">
-        <label class="form-label">Category</label>
+        <label class="form-label">{{ _('Category') }}</label>
         <input name="category" class="form-control" value="{{ exercise.category }}" required>
       </div>
 
       <div class="col-md-8">
-        <label class="form-label">Needed Material</label>
+        <label class="form-label">{{ _('Needed Material') }}</label>
         <input name="needed_material" class="form-control" value="{{ exercise.needed_material }}">
       </div>
 
       <div class="col-12">
-        <label class="form-label">Execution Description</label>
+        <label class="form-label">{{ _('Execution Description') }}</label>
         <textarea name="execution_description" rows="4" class="form-control">{{ exercise.execution_description }}</textarea>
       </div>
 
       {% for i in range(1, 5) %}
       <div class="col-md-3">
-        <label class="form-label">Image {{ i }}</label>
+        <label class="form-label">{{ _('Image') }} {{ i }}</label>
         <input name="image{{ i }}" class="form-control" value="{{ exercise['image' ~ i] }}">
       </div>
       {% endfor %}
 
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-        <a href="/practise/practice-exercises" class="btn btn-outline-secondary">⬅ Back</a>
+        <button type="submit" class="btn btn-primary">💾 {{ _('Save Changes') }}</button>
+        <a href="/practise/practice-exercises" class="btn btn-outline-secondary">⬅ {{ _('Back') }}</a>
       </div>
 
     </form>

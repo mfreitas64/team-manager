@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Home – Team Manager{% endblock %}
+{% block title %}{{ _('Home – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="card">
   <div class="card-header text-center">
-    📊 Player Participation – Statistics in Totals
+    📊 {{ _('Player Participation – Statistics in Totals') }}
   </div>
   <div class="card-body">
 
     <!-- Export Button -->
     <div class="d-flex justify-content-end mb-3">
       <a href="{{ url_for('export.export_totals_csv') }}" class="btn btn-outline-success">
-        ⬇️ Export to CSV
+        ⬇️ {{ _('Export to CSV') }}
       </a>
     </div>
 
@@ -21,15 +21,15 @@
       <canvas id="totalsChart"></canvas>
     </div>
 
-    <!-- Stats Table -->
+    <!-- Data Table -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle text-center">
         <thead class="table-light">
           <tr>
-            <th>Player</th>
-            <th>Games Played</th>
-            <th>Practices Attended</th>
-            <th>Total Activities</th>
+            <th>{{ _('Player') }}</th>
+            <th>{{ _('Games Played') }}</th>
+            <th>{{ _('Practices Attended') }}</th>
+            <th>{{ _('Total Activities') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -51,9 +51,7 @@
 {% endblock %}
 
 {% block js %}
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const ctx = document.getElementById('totalsChart').getContext('2d');
@@ -64,22 +62,22 @@
         labels: {{ players | map(attribute='name') | list | tojson | safe }},
         datasets: [
           {
-            label: 'Games Played',
-            backgroundColor: '#0d6efd',
+            label: '{{ _("Games Played") }}',
             data: [
               {% for player in players %}
                 {{ totals_data.get(player.name, {}).get('games_played', 0) }},
               {% endfor %}
-            ]
+            ],
+            backgroundColor: '#0d6efd'
           },
           {
-            label: 'Practices Attended',
-            backgroundColor: '#ffc107',
+            label: '{{ _("Practices Attended") }}',
             data: [
               {% for player in players %}
                 {{ totals_data.get(player.name, {}).get('practices_attended', 0) }},
               {% endfor %}
-            ]
+            ],
+            backgroundColor: '#ffc107'
           }
         ]
       },
@@ -90,7 +88,7 @@
           legend: { position: 'top' },
           title: {
             display: true,
-            text: 'Games and Practices by Player'
+            text: '{{ _("Games and Practices by Player") }}'
           }
         },
         scales: {

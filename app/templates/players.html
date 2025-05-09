@@ -1,78 +1,74 @@
 {% extends 'base.html' %}
-{% block title %}Team Roster – Team Manager{% endblock %}
+{% block title %}{{ _('Team Roster') }} – Team Manager{% endblock %}
 
 {% block content %}
 <div class="card mx-auto" style="max-width: 1000px;">
-  <!-- Accordion Toggle Header -->
   <div class="card-header d-flex justify-content-between align-items-center"
        style="cursor: pointer; background-color: #f4ede4; color: #343a40; font-weight: bold;"
        onclick="toggleForm()">
-    <span>➕ Add New Player</span>
+    <span>➕ {{ _('Add New Player') }}</span>
     <span id="toggleIcon">▼</span>
   </div>
 
-  <!-- Toggleable Form -->
   <div id="playerForm" class="card-body {% if not open_form %}d-none{% endif %}">
     <form method="post" class="row g-3">
       <div class="col-md-4">
-        <label class="form-label">Season Year</label>
+        <label class="form-label">{{ _('Season Year') }}</label>
         <input name="season_year" class="form-control" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Name</label>
+        <label class="form-label">{{ _('Name') }}</label>
         <input name="name" class="form-control" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Escalão</label>
+        <label class="form-label">{{ _('Escalão') }}</label>
         <input name="escalao" class="form-control" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Nº Carteira</label>
+        <label class="form-label">{{ _('Nº Carteira') }}</label>
         <input name="n_carteira" class="form-control" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Date of Birth</label>
+        <label class="form-label">{{ _('Date of Birth') }}</label>
         <input type="date" name="dob" class="form-control" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Mobile Phone</label>
+        <label class="form-label">{{ _('Mobile Phone') }}</label>
         <input name="mobile_phone" class="form-control">
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">Email</label>
+        <label class="form-label">{{ _('Email') }}</label>
         <input type="email" name="email" class="form-control">
       </div>
 
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-success">➕ Add Player</button>
+        <button type="submit" class="btn btn-success">➕ {{ _('Add Player') }}</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Divider -->
 <hr class="my-4">
 
-<!-- Team Roster -->
-<h2 class="mt-4">📋 Team Roster</h2>
+<h2 class="mt-4">📋 {{ _('Team Roster') }}</h2>
 
 <div class="table-responsive">
   <table class="table table-striped table-bordered mt-3 align-middle text-center">
     <thead class="table-dark">
       <tr>
-        <th>Name</th>
-        <th>Escalão</th>
-        <th>Carteira</th>
-        <th>DOB</th>
-        <th>Phone</th>
-        <th>Email</th>
-        <th>Actions</th>
+        <th>{{ _('Name') }}</th>
+        <th>{{ _('Escalão') }}</th>
+        <th>{{ _('Carteira') }}</th>
+        <th>{{ _('DOB') }}</th>
+        <th>{{ _('Phone') }}</th>
+        <th>{{ _('Email') }}</th>
+        <th>{{ _('Actions') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -85,18 +81,18 @@
           <td>{{ player.mobile_phone }}</td>
           <td>{{ player.email }}</td>
           <td class="text-nowrap">
-            <a href="{{ url_for('players.edit_player', player_id=player.id) }}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
+            <a href="{{ url_for('players.edit_player', player_id=player.id) }}" class="btn btn-sm btn-outline-warning">✏️ {{ _('Edit') }}</a>
             <form action="{{ url_for('players.delete_player', player_id=player.id) }}" method="POST" class="d-inline">
               <button type="submit" class="btn btn-sm btn-outline-danger mb-1"
-                onclick="return confirm('Are you sure you want to delete this player?');">
-                🗑 Delete
+                onclick="return confirm('{{ _('Are you sure you want to delete this player?') }}');">
+                🗑 {{ _('Delete') }}
               </button>
             </form>
             <a href="{{ url_for('players.player_season_stats', player_id=player.id) }}" class="btn btn-sm btn-outline-info mb-1">
-              📊 Stats
+              📊 {{ _('Stats') }}
             </a>
             <a href="{{ url_for('players.player_history', player_id=player.id) }}" class="btn btn-sm btn-outline-dark mb-1">
-              📈 History
+              📈 {{ _('History') }}
             </a>
           </td>
         </tr>

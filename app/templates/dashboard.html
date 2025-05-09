@@ -1,25 +1,25 @@
 {% extends 'base.html' %}
 
-{% block title %}Home – Team Manager{% endblock %}
+{% block title %}{{ _('Home – Team Manager') }}{% endblock %}
 
 {% block content %}
 
 <div class="container">
-  <h1 class="mb-4">📊 Player Dashboard</h1>
+  <h1 class="mb-4">📊 {{ _('Player Dashboard') }}</h1>
   <canvas id="playerChart" height="100"></canvas>
 
   <div class="mb-3">
-    <label for="playerFilter" class="form-label">Filter by Player</label>
-    <input type="text" class="form-control" id="playerFilter" placeholder="Type a player's name...">
+    <label for="playerFilter" class="form-label">{{ _('Filter by Player') }}</label>
+    <input type="text" class="form-control" id="playerFilter" placeholder="{{ _('Type a player\'s name...') }}">
   </div>
 
   <table class="table table-bordered table-striped align-middle" id="playerStats">
     <thead class="table-dark">
       <tr>
-        <th>Player</th>
-        <th>Time Played (min)</th>
-        <th>Practice Time (min)</th>
-        <th>Total Minutes</th>
+        <th>{{ _('Player') }}</th>
+        <th>{{ _('Time Played (min)') }}</th>
+        <th>{{ _('Practice Time (min)') }}</th>
+        <th>{{ _('Total Minutes') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -59,12 +59,12 @@
       labels: {{ chart_labels | tojson | safe }},
       datasets: [
         {
-          label: 'Time Played (min)',
+          label: '{{ _("Time Played (min)") }}',
           data: {{ chart_played | tojson | safe }},
           backgroundColor: '#0d6efd'
         },
         {
-          label: 'Practice Time (min)',
+          label: '{{ _("Practice Time (min)") }}',
           data: {{ chart_practiced | tojson | safe }},
           backgroundColor: '#ffc107'
         }
@@ -74,7 +74,10 @@
       responsive: true,
       plugins: {
         legend: { position: 'top' },
-        title: { display: true, text: 'Player Participation Overview' }
+        title: {
+          display: true,
+          text: '{{ _("Player Participation Overview") }}'
+        }
       },
       scales: {
         x: { stacked: true },
@@ -83,5 +86,4 @@
     }
   });
 </script>
-
-{% endblock % }
+{% endblock %}

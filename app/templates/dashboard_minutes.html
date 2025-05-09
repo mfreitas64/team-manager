@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Home – Team Manager{% endblock %}
+{% block title %}{{ _('Home – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="card">
   <div class="card-header text-center">
-    📊 Player Participation – Statistics in Minutes
+    📊 {{ _('Player Participation – Statistics in Minutes') }}
   </div>
   <div class="card-body">
 
     <!-- Export Button -->
     <div class="d-flex justify-content-end mb-3">
       <a href="{{ url_for('export.export_minutes_csv') }}" class="btn btn-outline-success">
-        ⬇️ Export to CSV
+        ⬇️ {{ _('Export to CSV') }}
       </a>
     </div>
 
@@ -26,10 +26,10 @@
       <table class="table table-bordered table-striped align-middle text-center">
         <thead class="table-light">
           <tr>
-            <th>Player</th>
-            <th>Time Played (min)</th>
-            <th>Practice Time (min)</th>
-            <th>Total Minutes</th>
+            <th>{{ _('Player') }}</th>
+            <th>{{ _('Time Played (min)') }}</th>
+            <th>{{ _('Practice Time (min)') }}</th>
+            <th>{{ _('Total Minutes') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -51,9 +51,7 @@
 {% endblock %}
 
 {% block js %}
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const ctx = document.getElementById('playerChart').getContext('2d');
@@ -64,12 +62,12 @@
         labels: {{ chart_labels | tojson | safe }},
         datasets: [
           {
-            label: 'Time Played (min)',
+            label: '{{ _("Time Played (min)") }}',
             data: {{ chart_played | tojson | safe }},
             backgroundColor: '#0d6efd'
           },
           {
-            label: 'Practice Time (min)',
+            label: '{{ _("Practice Time (min)") }}',
             data: {{ chart_practiced | tojson | safe }},
             backgroundColor: '#ffc107'
           }
@@ -82,7 +80,7 @@
           legend: { position: 'top' },
           title: {
             display: true,
-            text: 'Participation by Player'
+            text: '{{ _("Participation by Player") }}'
           }
         },
         scales: {

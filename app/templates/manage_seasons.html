@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Manage Seasons{% endblock %}
+{% block title %}{{ _('Manage Seasons') }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto" style="max-width: 700px;">
   <div class="card-header text-center">
-    📆 Manage Seasons
+    📆 {{ _('Manage Seasons') }}
   </div>
   <div class="card-body">
 
     <!-- 🎯 Set Active Season -->
     <form method="POST" action="{{ url_for('season.set_season') }}" class="row g-2 mb-4 align-items-end">
       <div class="col-md-10">
-        <label for="season_id" class="form-label fw-bold">Select Active Season:</label>
+        <label for="season_id" class="form-label fw-bold">{{ _('Select Active Season:') }}</label>
         <select name="season_id" id="season_id" class="form-select" required>
           {% for s in seasons %}
             <option value="{{ s.id }}" {% if s.id == current_season_id %}selected{% endif %}>{{ s.name }}</option>
@@ -19,26 +19,26 @@
         </select>
       </div>
       <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Set</button>
+        <button type="submit" class="btn btn-primary w-100">{{ _('Set') }}</button>
       </div>
     </form>
 
     <!-- ➕ Add New Season -->
     <form method="POST" class="row g-2 mb-4">
       <div class="col-md-6">
-        <input type="text" name="name" placeholder="Season Name (e.g. 2024/2025)" class="form-control" required>
+        <input type="text" name="name" placeholder="{{ _('Season Name (e.g. 2024/2025)') }}" class="form-control" required>
       </div>
       <div class="col-md-4">
-        <input type="text" name="year" placeholder="Year (optional)" class="form-control">
+        <input type="text" name="year" placeholder="{{ _('Year (optional)') }}" class="form-control">
       </div>
       <div class="col-md-2">
-        <button class="btn btn-success w-100">Add</button>
+        <button class="btn btn-success w-100">{{ _('Add') }}</button>
       </div>
       <div class="col-12">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" name="copy_players" id="copy_players" checked>
           <label class="form-check-label" for="copy_players">
-            Copy players from current season
+            {{ _('Copy players from current season') }}
           </label>
         </div>
       </div>
@@ -52,11 +52,11 @@
             <strong>{{ s.name }}</strong> {% if s.year %}({{ s.year }}){% endif %}
           </div>
           {% if session.get('season_id') == s.id %}
-            <span class="badge bg-primary">Current</span>
+            <span class="badge bg-primary">{{ _('Current') }}</span>
           {% endif %}
         </li>
       {% else %}
-        <li class="list-group-item">No seasons yet. Add one above.</li>
+        <li class="list-group-item">{{ _('No seasons yet. Add one above.') }}</li>
       {% endfor %}
     </ul>
 

@@ -1,56 +1,56 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Player – Team Manager{% endblock %}
+{% block title %}{{ _('Edit Player – Team Manager') }}{% endblock %}
 
 {% block content %}
 
 <div class="card mx-auto mt-4" style="max-width: 800px;">
   <div class="card-header text-center">
-    ✏️ Edit Player
+    ✏️ {{ _('Edit Player') }}
   </div>
   <div class="card-body">
     <form method="post" class="row g-3">
 
       {% if season %}
       <div class="col-md-6 offset-md-1">
-        <label class="form-label">Current Season</label>
+        <label class="form-label">{{ _('Current Season') }}</label>
         <input class="form-control" value="{{ season.name }}" disabled>
       </div>
       {% endif %}
 
       <div class="col-md-8 offset-md-1">
-        <label class="form-label">Player Name</label>
+        <label class="form-label">{{ _('Player Name') }}</label>
         <input name="name" class="form-control" value="{{ player.name }}" required>
       </div>
 
       <div class="col-md-4 offset-md-1">
-        <label class="form-label">Escalão</label>
+        <label class="form-label">{{ _('Escalão') }}</label>
         <input name="escalao" class="form-control" value="{{ player.escalao }}">
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Nº Carteira</label>
+        <label class="form-label">{{ _('Nº Carteira') }}</label>
         <input name="n_carteira" class="form-control" value="{{ player.n_carteira }}">
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Date of Birth</label>
+        <label class="form-label">{{ _('Date of Birth') }}</label>
         <input type="date" name="dob" class="form-control" value="{{ player.dob }}">
       </div>
 
       <div class="col-md-6 offset-md-1">
-        <label class="form-label">Mobile Phone</label>
+        <label class="form-label">{{ _('Mobile Phone') }}</label>
         <input name="mobile_phone" class="form-control" value="{{ player.mobile_phone }}">
       </div>
 
       <div class="col-md-5">
-        <label class="form-label">Email</label>
+        <label class="form-label">{{ _('Email') }}</label>
         <input name="email" class="form-control" value="{{ player.email }}">
       </div>
 
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-success">💾 Save Changes</button>
-        <a href="/players" class="btn btn-outline-secondary">⬅️ Cancel</a>
+        <button type="submit" class="btn btn-success">💾 {{ _('Save Changes') }}</button>
+        <a href="/players" class="btn btn-outline-secondary">⬅️ {{ _('Cancel') }}</a>
       </div>
 
     </form>

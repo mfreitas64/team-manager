@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ get_locale() }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,7 +14,7 @@
       background-color: #fffdf9;
     }
     .navbar {
-      background-color: #ff7f50; /* Coral warm tone */
+      background-color: #eb6636; /* Coral warm tone */
     }
     .navbar .nav-link, .navbar .navbar-brand {
       color: white !important;
@@ -36,27 +36,51 @@
   {% block head %}{% endblock %}
 </head>
 <body>
-
+ 
 <!-- ✅ Responsive Navbar -->
 <nav class="navbar navbar-expand-lg mb-4 shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">🏀 Team Manager</a>
+    <a class="navbar-brand" href="/">{{ _('🏀 Team Manager') }}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('players.manage_players') }}">Players</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('practise.practice_exercises') }}">Practice Exercises</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('tournaments.manage_tournaments') }}">Tournaments</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('practise.practice_register') }}">Practice Register</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('players.manage_players') }}">{{ _('Players') }}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('practise.practice_exercises') }}">{{ _('Practice Exercises') }}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('tournaments.manage_tournaments') }}">{{ _('Tournaments') }}</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('practise.practice_register') }}">{{ _('Practice Register') }}</a></li>
         {% if not current_user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">Sign Up</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">{{ _('Sign Up') }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a></li>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a></li>
         {% endif %}
+        {% if current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.profile') }}">{{ _('Profile') }}</a></li>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.is_admin %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}">{{ _('Admin Dashboard') }}</a></li>
+        {% endif %}
+          <!-- Language Switcher -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              🌐 {{ get_locale().upper() }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+              <li>
+                <a class="dropdown-item" href="{{ url_for_lang('en') }}">
+                  🇬🇧 English
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for_lang('pt') }}">
+                  🇵🇹 Português
+                </a>
+              </li>
+            </ul>
+          </li>                            
       </ul>
     </div>
   </div>

@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Practice Register – Team Manager{% endblock %}
+{% block title %}{{ _('Edit Practice Register – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto" style="max-width: 750px;">
   <div class="card-header text-center">
-    ✏️ Edit Practice Register – {{ register.date }}
+    ✏️ {{ _('Edit Practice Register') }} – {{ register.date }}
   </div>
   <div class="card-body">
     <form method="post" class="row g-3">
 
       <div class="col-md-4">
-        <label class="form-label">Practice Date</label>
+        <label class="form-label">{{ _('Practice Date') }}</label>
         <input type="date" name="date" value="{{ register.date }}" class="form-control" required>
       </div>
 
       <div class="col-md-3">
-        <label class="form-label">Duration (minutes)</label>
+        <label class="form-label">{{ _('Duration (minutes)') }}</label>
         <input type="number" name="duration_minutes"
                class="form-control"
                min="0"
@@ -25,7 +25,7 @@
       </div>
 
       <div class="col-12">
-        <label class="form-label">Players Present</label>
+        <label class="form-label">{{ _('Players Present') }}</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
           <div class="row">
             {% for p in players %}
@@ -42,7 +42,7 @@
       </div>
 
       <div class="col-12">
-        <label class="form-label">Exercises Used</label>
+        <label class="form-label">{{ _('Exercises Used') }}</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
           {% for e in exercises %}
             <div class="form-check">
@@ -57,13 +57,13 @@
       </div>
 
       <div class="col-12">
-        <label class="form-label">Coach Notes</label>
+        <label class="form-label">{{ _('Coach Notes') }}</label>
         <textarea name="coach_notes" class="form-control" rows="3">{{ register.coach_notes }}</textarea>
       </div>
 
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-        <a href="/practise/practice-register" class="btn btn-outline-secondary">⬅ Back</a>
+        <button type="submit" class="btn btn-primary">💾 {{ _('Save Changes') }}</button>
+        <a href="/practise/practice-register" class="btn btn-outline-secondary">⬅ {{ _('Back') }}</a>
       </div>
 
     </form>

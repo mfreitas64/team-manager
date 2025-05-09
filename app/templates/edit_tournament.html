@@ -1,39 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Tournament – Team Manager{% endblock %}
+{% block title %}{{ _('Edit Tournament – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto" style="max-width: 800px;">
   <div class="card-header text-center">
-    ✏️ Edit Tournament: {{ tournament.team_name }}
+    ✏️ {{ _('Edit Tournament') }}: {{ tournament.team_name }}
   </div>
   <div class="card-body">
     <form method="post" class="row g-3">
 
       <div class="col-md-4">
-        <label class="form-label">Date</label>
+        <label class="form-label">{{ _('Date') }}</label>
         <input type="date" name="date" class="form-control" value="{{ tournament.date }}" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Place</label>
+        <label class="form-label">{{ _('Place') }}</label>
         <input name="place" class="form-control" value="{{ tournament.place }}" required>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Team Name</label>
+        <label class="form-label">{{ _('Team Name') }}</label>
         <input name="team_name" class="form-control" value="{{ tournament.team_name }}" required>
       </div>
 
       {% for i in range(6) %}
         <div class="col-md-4">
-          <label class="form-label">Opponent {{ i + 1 }}</label>
+          <label class="form-label">{{ _('Opponent') }} {{ i + 1 }}</label>
           <input name="opponent{{ i+1 }}" class="form-control" value="{{ current_opponents[i] if i < current_opponents|length else '' }}">
         </div>
       {% endfor %}
 
       <div class="col-12">
-        <label class="form-label">Select Players</label>
+        <label class="form-label">{{ _('Select Players') }}</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
           <div class="row">
             {% for p in all_players %}
@@ -50,13 +50,13 @@
       </div>
 
       <div class="col-12">
-        <label class="form-label">Coach Notes</label>
+        <label class="form-label">{{ _('Coach Notes') }}</label>
         <textarea name="coach_notes" rows="4" class="form-control">{{ tournament.coach_notes }}</textarea>
       </div>
 
       <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end">
-        <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-        <a href="/tournament/{{ tournament.id }}" class="btn btn-outline-secondary">⬅ Back</a>
+        <button type="submit" class="btn btn-primary">💾 {{ _('Save Changes') }}</button>
+        <a href="/tournament/{{ tournament.id }}" class="btn btn-outline-secondary">⬅ {{ _('Back') }}</a>
       </div>
 
     </form>

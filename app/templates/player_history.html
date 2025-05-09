@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}Player History – {{ player.name }}{% endblock %}
+{% block title %}{{ _('Player History') }} – {{ player.name }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto" style="max-width: 900px;">
   <div class="card-header text-center">
-    📊 Season History — {{ player.name }}
+    📊 {{ _('Season History') }} — {{ player.name }}
   </div>
   <div class="card-body">
 
@@ -13,7 +13,7 @@
       <div class="col-md-6 mb-3 mb-md-0">
         <div class="card border-success text-center h-100">
           <div class="card-body">
-            <h5 class="card-title">🏀 Games Played</h5>
+            <h5 class="card-title">🏀 {{ _('Games Played') }}</h5>
             <p class="display-5">{{ total_games }}</p>
           </div>
         </div>
@@ -21,7 +21,7 @@
       <div class="col-md-6">
         <div class="card border-primary text-center h-100">
           <div class="card-body">
-            <h5 class="card-title">📅 Practices Attended</h5>
+            <h5 class="card-title">📅 {{ _('Practices Attended') }}</h5>
             <p class="display-5">{{ total_practices }}</p>
           </div>
         </div>
@@ -35,18 +35,18 @@
 
     <!-- Season Stats Table -->
     <div class="card">
-      <div class="card-header fw-bold">🧠 Seasonal Evaluations</div>
+      <div class="card-header fw-bold">🧠 {{ _('Seasonal Evaluations') }}</div>
       <div class="table-responsive">
         <table class="table table-sm align-middle">
           <thead class="table-light">
             <tr>
-              <th>Season</th>
-              <th>Behavior</th>
-              <th>Technical Skills</th>
-              <th>Team Relation</th>
-              <th>Improvement Areas</th>
-              <th>Height (cm)</th>
-              <th>Weight (kg)</th>
+              <th>{{ _('Season') }}</th>
+              <th>{{ _('Behavior') }}</th>
+              <th>{{ _('Technical Skills') }}</th>
+              <th>{{ _('Team Relation') }}</th>
+              <th>{{ _('Improvement Areas') }}</th>
+              <th>{{ _('Height (cm)') }}</th>
+              <th>{{ _('Weight (kg)') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -68,7 +68,7 @@
 
     <!-- Back Button -->
     <div class="mt-3 text-end">
-      <a href="{{ url_for('players.manage_players') }}" class="btn btn-outline-secondary">← Back to Players</a>
+      <a href="{{ url_for('players.manage_players') }}" class="btn btn-outline-secondary">← {{ _('Back to Players') }}</a>
     </div>
 
   </div>
@@ -81,7 +81,7 @@ const ctx = document.getElementById('historyChart').getContext('2d');
 const chart = new Chart(ctx, {
   type: 'bar',
   data: {
-    labels: ['Games Played', 'Practices Attended'],
+    labels: ['{{ _("Games Played") }}', '{{ _("Practices Attended") }}'],
     datasets: [{
       label: '{{ player.name }}',
       data: [{{ total_games }}, {{ total_practices }}],
@@ -93,7 +93,7 @@ const chart = new Chart(ctx, {
     responsive: true,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: 'Participation Summary' }
+      title: { display: true, text: '{{ _("Participation Summary") }}' }
     },
     scales: {
       y: { beginAtZero: true }

@@ -1,31 +1,31 @@
 {% extends 'base.html' %}
 
-{% block title %}Login – Team Manager{% endblock %}
+{% block title %}{{ _('Login – Team Manager') }}{% endblock %}
 
 {% block content %}
 <div class="card mx-auto mt-5 shadow-sm" style="max-width: 500px;">
   <div class="card-header text-center">
-    🔐 Login to Your Account
+    🔐 {{ _('Login to Your Account') }}
   </div>
   <div class="card-body">
     <form method="POST" class="row g-3">
 
       <!-- Email Field -->
       <div class="col-12">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label">{{ _('Email') }}</label>
         <input type="email" name="email" class="form-control" required>
       </div>
 
       <!-- Password Field -->
       <div class="col-12">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label">{{ _('Password') }}</label>
         <input type="password" name="password" class="form-control" required>
       </div>
 
       <!-- Submit Button -->
       <div class="col-12 d-grid gap-2">
-        <button type="submit" class="btn btn-primary">🔓 Login</button>
-        <a href="/signup" class="btn btn-link">Don't have an account? Sign up</a>
+        <button type="submit" class="btn btn-primary">🔓 {{ _('Login') }}</button>
+        <a href="/signup" class="btn btn-link">{{ _("Don't have an account? Sign up") }}</a>
       </div>
     </form>
   </div>
