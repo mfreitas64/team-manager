@@ -63,7 +63,8 @@
 
 <h2 class="mt-4">📋 {{ _('Team Roster') }}</h2>
 
-<div class="table-responsive">
+<!-- Table View (desktop and tablet) -->
+<div class="table-responsive d-none d-sm-block">
   <table class="table table-striped table-bordered mt-3 align-middle text-center">
     <thead class="table-dark">
       <tr>
@@ -87,25 +88,51 @@
           <td>{{ player.dob }}</td>
           <td>{{ player.mobile_phone }}</td>
           <td>{{ player.email }}</td>
-          <td class="text-nowrap">
-            <a href="{{ url_for('players.edit_player', player_id=player.id) }}" class="btn btn-sm btn-outline-warning">✏️ {{ _('Edit') }}</a>
-            <form action="{{ url_for('players.delete_player', player_id=player.id) }}" method="POST" class="d-inline">
-              <button type="submit" class="btn btn-sm btn-outline-danger mb-1"
-                onclick="return confirm('{{ _('Are you sure you want to delete this player?') }}');">
-                🗑 {{ _('Delete') }}
-              </button>
-            </form>
-            <a href="{{ url_for('players.player_season_stats', player_id=player.id) }}" class="btn btn-sm btn-outline-info mb-1">
-              📊 {{ _('Stats') }}
-            </a>
-            <a href="{{ url_for('players.player_history', player_id=player.id) }}" class="btn btn-sm btn-outline-dark mb-1">
-              📈 {{ _('History') }}
-            </a>
+          <td style="white-space: normal;">
+            <div class="d-flex flex-wrap gap-1 justify-content-left"></div>
+                <a href="{{ url_for('players.edit_player', player_id=player.id) }}" title="{{ _('Edit') }}" class="btn btn-sm btn-outline-warning">✏️</a>
+                <form action="{{ url_for('players.delete_player', player_id=player.id) }}" method="POST" class="d-inline">
+                  <button type="submit" title="{{ _('Delete') }}" class="btn btn-sm btn-outline-danger mb-1"
+                    onclick="return confirm('{{ _('Are you sure you want to delete this player?') }}');">🗑
+                  </button>
+                </form>
+                <a href="{{ url_for('players.player_season_stats', player_id=player.id) }}" title="{{ _('Stats') }}" class="btn btn-sm btn-outline-info mb-1">📊</a>
+                <a href="{{ url_for('players.player_history', player_id=player.id) }}" title="{{ _('History') }}" class="btn btn-sm btn-outline-dark mb-1">📈</a>
+            </div>
           </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
+</div>
+
+<!-- Mobile View (card layout) -->
+<div class="d-sm-none">
+  {% for player in players %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ player.alias }}</h5>
+        <p class="card-text mb-1"><strong>{{ _('Name:') }}</strong> {{ player.name }}</p>
+        <p class="card-text mb-1"><strong>{{ _('Escalão:') }}</strong> {{ player.escalao }}</p>
+        <p class="card-text mb-1"><strong>{{ _('Carteira:') }}</strong> {{ player.n_carteira }}</p>
+        <p class="card-text mb-1"><strong>{{ _('DOB:') }}</strong> {{ player.dob }}</p>
+        <p class="card-text mb-1"><strong>{{ _('Phone:') }}</strong> {{ player.mobile_phone }}</p>
+        <p class="card-text mb-1"><strong>{{ _('Email:') }}</strong> {{ player.email }}</p>
+
+        <div class="mt-3 d-flex gap-2 flex-wrap">
+          <a href="{{ url_for('players.edit_player', player_id=player.id) }}" class="btn btn-sm btn-outline-warning">✏️ {{ _('Edit') }}</a>
+          <a href="{{ url_for('players.player_season_stats', player_id=player.id) }}" class="btn btn-sm btn-outline-info">📊 {{ _('Stats') }}</a>
+          <a href="{{ url_for('players.player_history', player_id=player.id) }}" class="btn btn-sm btn-outline-dark">📈 {{ _('History') }}</a>
+          <form action="{{ url_for('players.delete_player', player_id=player.id) }}" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('{{ _('Are you sure you want to delete this player?') }}');">
+              🗑 {{ _('Delete') }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}
 

@@ -15,7 +15,10 @@ def practice_register():
     if not season_id:
         return redirect(url_for('season.manage_seasons'))
 
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
+    alias_lookup = {p["name"]: p["alias"] for p in all_players}
+
     all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':
@@ -69,7 +72,8 @@ def practice_register():
         players=all_players,
         exercises=all_exercises,
         registers=past_registers,
-        from_date=filter_date_str  # 👈 important for form value
+        from_date=filter_date_str,
+        alias_lookup=alias_lookup  
     )
 
 @practise_bp.route('/practice-register/<int:register_id>/edit', methods=['GET', 'POST'])
@@ -87,7 +91,9 @@ def edit_practice_register(register_id):
     if register.user_id != current_user.id or register.season_id != season_id:
         return "⛔️ Unauthorized", 403
 
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
+
     all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 
     if request.method == 'POST':

@@ -26,18 +26,16 @@
 
       <div class="col-12">
         <label class="form-label">{{ _('Players Present') }}</label>
-        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-          <div class="row">
-            {% for p in players %}
-              <div class="col-6 col-md-4">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="players" value="{{ p.name }}"
-                         {% if p.name in selected_players %}checked{% endif %}>
-                  <label class="form-check-label">{{ p.name }}</label>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
+        <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto; white-space: normal;">
+          {% for player in players %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}" id="player{{ loop.index }}"
+                    {% if player.name in selected_players %}checked{% endif %}>
+              <label class="form-check-label" for="player{{ loop.index }}">
+                {{ player.alias }}
+              </label>
+            </div>
+          {% endfor %}
         </div>
       </div>
 
