@@ -17,6 +17,7 @@ class PlayerModel(db.Model):
     email = db.Column(db.String(120))
     escalao = db.Column(db.String(50))
     n_carteira = db.Column(db.String(50))
+    alias = db.Column(db.String(20))
 
     season = db.relationship('SeasonModel', backref='players')
 

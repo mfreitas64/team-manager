@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-09 02:01+0100\n"
+"POT-Creation-Date: 2025-05-12 15:58+0100\n"
 "PO-Revision-Date: 2025-05-09 02:01+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -18,43 +18,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/templates/base.html:44
+#: app/templates/base.html:43
 msgid "🏀 Team Manager"
 msgstr "🏀 Gestão de Equipas"
 
-#: app/templates/base.html:51
+#: app/templates/base.html:50
 msgid "Players"
 msgstr "Jogadores"
 
-#: app/templates/base.html:52 app/templates/index.html:45
+#: app/templates/base.html:51 app/templates/index.html:45
 #: app/templates/practice_exercises.html:3
 msgid "Practice Exercises"
 msgstr "Exercícios"
 
-#: app/templates/base.html:53 app/templates/index.html:56
+#: app/templates/base.html:52 app/templates/index.html:56
 msgid "Tournaments"
 msgstr "Encontros"
 
-#: app/templates/base.html:54 app/templates/index.html:34
+#: app/templates/base.html:53 app/templates/index.html:34
 #: app/templates/practice_register.html:3
 msgid "Practice Register"
 msgstr "Registo dos Treinos"
 
-#: app/templates/base.html:56 app/templates/signup.html:29
+#: app/templates/base.html:55 app/templates/signup.html:29
 msgid "Sign Up"
 msgstr "Criar conta"
 
-#: app/templates/base.html:57 app/templates/login.html:27
+#: app/templates/base.html:56 app/templates/login.html:27
 msgid "Login"
 msgstr "Entrar"
 
-#: app/templates/base.html:59
+#: app/templates/base.html:58
 msgid "Logout"
 msgstr "Sair"
 
-#: app/templates/base.html:62
-msgid "Profile"
-msgstr "Perfil"
+#: app/templates/base.html:61
+#, fuzzy
+msgid "Admin Dashboard"
+msgstr "Painel"
 
 #: app/templates/dashboard.html:3 app/templates/dashboard_minutes.html:3
 #: app/templates/dashboard_totals.html:3 app/templates/index.html:3
@@ -154,36 +155,45 @@ msgid "Player Name"
 msgstr "Nome do jogador"
 
 #: app/templates/edit_player.html:27 app/templates/players.html:26
-#: app/templates/players.html:66
+#: app/templates/players.html:70
+msgid "Alias"
+msgstr "Alias"
+
+#: app/templates/edit_player.html:28 app/templates/players.html:27
+msgid "Optional short name"
+msgstr "Nome curto (opcional)"
+
+#: app/templates/edit_player.html:32 app/templates/players.html:31
+#: app/templates/players.html:72
 msgid "Escalão"
 msgstr "Level"
 
-#: app/templates/edit_player.html:32 app/templates/players.html:31
+#: app/templates/edit_player.html:37 app/templates/players.html:36
 msgid "Nº Carteira"
 msgstr "Carteira FPB"
 
-#: app/templates/edit_player.html:37 app/templates/players.html:36
+#: app/templates/edit_player.html:42 app/templates/players.html:41
 msgid "Date of Birth"
 msgstr "Data de nascimento"
 
-#: app/templates/edit_player.html:42 app/templates/players.html:41
+#: app/templates/edit_player.html:47 app/templates/players.html:46
 msgid "Mobile Phone"
 msgstr "Telemóvel"
 
-#: app/templates/edit_player.html:47 app/templates/login.html:15
-#: app/templates/players.html:46 app/templates/players.html:70
+#: app/templates/edit_player.html:52 app/templates/login.html:15
+#: app/templates/players.html:51 app/templates/players.html:76
 #: app/templates/signup.html:19
 msgid "Email"
 msgstr "Email"
 
-#: app/templates/edit_player.html:52
+#: app/templates/edit_player.html:57
 #: app/templates/edit_practice_exercise.html:36
 #: app/templates/edit_practice_register.html:65
 #: app/templates/edit_tournament.html:58
 msgid "Save Changes"
 msgstr "Guardar"
 
-#: app/templates/edit_player.html:53
+#: app/templates/edit_player.html:58
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -290,7 +300,7 @@ msgstr "Bem-vindo à sua Gestão de Equipas"
 
 #: app/templates/index.html:8
 msgid "Your all-in-one toolkit for managing players, practices, and tournaments"
-msgstr "O seu kit de ferramentas completo para gerir épocas, equipas, treinos, encontros"
+msgstr "O seu kit de ferramentas completo para gerir épocas, equipas, treinos,encontros."
 
 #: app/templates/index.html:12
 msgid "Welcome!"
@@ -502,9 +512,9 @@ msgstr "Estatisticas da Época"
 msgid "Save Stats"
 msgstr "Salvar Stats"
 
-#: app/templates/players.html:2 app/templates/players.html:59
+#: app/templates/players.html:2 app/templates/players.html:64
 msgid "Team Roster"
-msgstr "Capitão"
+msgstr "Atletas"
 
 #: app/templates/players.html:9
 msgid "Add New Player"
@@ -514,49 +524,49 @@ msgstr "Adicionar jogador"
 msgid "Season Year"
 msgstr "Época Ano"
 
-#: app/templates/players.html:21 app/templates/players.html:65
+#: app/templates/players.html:21 app/templates/players.html:71
 msgid "Name"
 msgstr "Nome"
 
-#: app/templates/players.html:51
+#: app/templates/players.html:56
 msgid "Add Player"
 msgstr "Adicionar jogador"
 
-#: app/templates/players.html:67
+#: app/templates/players.html:73
 msgid "Carteira"
 msgstr "Carteira"
 
-#: app/templates/players.html:68
+#: app/templates/players.html:74
 msgid "DOB"
 msgstr "Data de nascimento"
 
-#: app/templates/players.html:69
+#: app/templates/players.html:75
 msgid "Phone"
 msgstr "Telemóvel"
 
-#: app/templates/players.html:71
+#: app/templates/players.html:77
 msgid "Actions"
 msgstr "Ações"
 
-#: app/templates/players.html:84 app/templates/practice_exercises.html:64
+#: app/templates/players.html:91 app/templates/practice_exercises.html:64
 #: app/templates/practice_register.html:100 app/templates/tournaments.html:88
 msgid "Edit"
 msgstr "Editar"
 
-#: app/templates/players.html:87
+#: app/templates/players.html:94
 msgid "Are you sure you want to delete this player?"
 msgstr "Tem a certeza que quer apagar este jogador?"
 
-#: app/templates/players.html:88 app/templates/practice_exercises.html:67
+#: app/templates/players.html:95 app/templates/practice_exercises.html:67
 #: app/templates/practice_register.html:104 app/templates/tournaments.html:92
 msgid "Delete"
 msgstr "Apagar"
 
-#: app/templates/players.html:92
+#: app/templates/players.html:99
 msgid "Stats"
 msgstr "Stats"
 
-#: app/templates/players.html:95
+#: app/templates/players.html:102
 msgid "History"
 msgstr "Histórico"
 
@@ -712,3 +722,7 @@ msgstr "Matrix"
 #: app/templates/tournaments.html:91
 msgid "Delete this tournament?"
 msgstr "Apagar este Encontro?"
+
+#~ msgid "Profile"
+#~ msgstr "Perfil"
+

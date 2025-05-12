@@ -59,7 +59,22 @@ def tournament_detail(tournament_id):
     if tournament.user_id != current_user.id or tournament.season_id != season_id:
         return "⛔️ Unauthorized", 403
  
-    players = [p.strip() for p in tournament.players.split(',') if p.strip()]
+    #players = [p.strip() for p in tournament.players.split(',') if p.strip()]
+    
+    # Get player objects with names in tournament.players
+    player_names = [p.strip() for p in tournament.players.split(',') if p.strip()]
+    player_objs = PlayerModel.query.filter(
+        PlayerModel.user_id == current_user.id,
+        PlayerModel.season_id == season_id,
+        PlayerModel.name.in_(player_names)
+    ).all()
+
+    # Create a mapping: player name → alias
+    players = [
+        {"name": p.name, "alias": p.alias or p.name}
+        for p in sorted(player_objs, key=lambda x: player_names.index(x.name))  # preserve order
+    ]
+
     opponents = [op.strip() for op in tournament.opponents.split(',') if op.strip()]
     periods = [1, 2, 3, 4]
 
@@ -70,13 +85,13 @@ def tournament_detail(tournament_id):
         for opponent in opponents:
             for period in periods:
                 for player in players:
-                    field_name = f"{opponent}_{period}_{player}".replace(" ", "_")
+                    field_name = f"{opponent}_{period}_{player['name']}".replace(" ", "_")
                     played = request.form.get(field_name) == "on"
                     matrix_entry = TournamentMatrixModel(
                         tournament_id=tournament_id,
                         user_id=current_user.id,
                         season_id=season_id,
-                        player_name=player,
+                        player_name=player['name'],
                         opponent_name=opponent,
                         period=period,
                         played=played

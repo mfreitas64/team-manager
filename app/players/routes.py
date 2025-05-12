@@ -19,6 +19,7 @@ def manage_players():
             user_id=current_user.id,
             season_id=season_id,
             name=request.form['name'],
+            alias=request.form['alias'],
             escalao=request.form['escalao'],
             n_carteira=request.form['n_carteira'],
             dob=request.form['dob'],
@@ -47,6 +48,7 @@ def edit_player(player_id):
 
     if request.method == 'POST':
         player.name = request.form['name'].strip()
+        player.alias = request.form.get('alias', '').strip()
         player.escalao = request.form['escalao']
         player.n_carteira = request.form['n_carteira']
         player.dob = request.form['dob']

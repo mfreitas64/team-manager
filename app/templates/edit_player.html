@@ -23,6 +23,11 @@
         <input name="name" class="form-control" value="{{ player.name }}" required>
       </div>
 
+      <div class="col-md-4">
+        <label class="form-label">{{ _('Alias') }}</label>
+        <input name="alias" class="form-control" placeholder="{{ _('Optional short name') }}">
+      </div>
+      
       <div class="col-md-4 offset-md-1">
         <label class="form-label">{{ _('Escalão') }}</label>
         <input name="escalao" class="form-control" value="{{ player.escalao }}">

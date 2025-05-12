@@ -25,7 +25,7 @@
       <!-- Submit Button -->
       <div class="col-12 d-grid gap-2">
         <button type="submit" class="btn btn-primary">🔓 {{ _('Login') }}</button>
-        <a href="/signup" class="btn btn-link">{{ _("Don't have an account? Sign up") }}</a>
+        <a href="{{ url_for('auth.signup') }}" class="btn btn-link">{{ _("Don't have an account? Sign up") }}</a>
       </div>
     </form>
   </div>

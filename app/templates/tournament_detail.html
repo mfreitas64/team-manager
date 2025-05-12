@@ -4,41 +4,29 @@
 
 {% block head %}
 <style>
-  .matrix-table th,
-  .matrix-table td {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.3rem;
-    text-align: center;
-    vertical-align: middle;
-    width: 60px;
-    white-space: nowrap;
-  }
+.matrix-table {
+  border-collapse: collapse;
+  width: 100%;
+  overflow-x: auto;
+}
 
-  .matrix-table th:first-child,
-  .matrix-table td:first-child {
-    width: auto;
-    min-width: 120px;
-    font-weight: bold;
-    text-align: left;
-    background-color: #f8f9fa;
-  }
+.matrix-table th,
+.matrix-table td {
+  padding: 6px;
+  border: 1px solid #ddd;
+  text-align: center;
+  white-space: nowrap;
+}
 
-  .sticky-top {
-    position: sticky;
-    top: 0;
-    background: #f8f9fa;
-    z-index: 1;
-  }
-
-  @media (max-width: 768px) {
-    .matrix-table {
-      font-size: 0.65rem;
-    }
-    .matrix-table th,
-    .matrix-table td {
-      width: 45px;
-    }
-  }
+.matrix-table th:first-child,
+.matrix-table td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: #f8f9fa;
+  z-index: 2;
+  box-shadow: 2px 0 5px -2px #888;
+  font-weight: bold;
+}
 </style>
 {% endblock %}
 
@@ -62,38 +50,40 @@
 
   <!-- Matrix Form -->
   <form method="post">
-    <div class="table-responsive">
-      <table class="table table-bordered matrix-table">
-        <thead class="table-light sticky-top">
-          <tr>
-            <th>{{ _('Player') }}</th>
-            {% for opponent in opponents %}
-              {% for period in periods %}
-                <th style="white-space: normal;">{{ opponent }}<br>{{ _('P') }}{{ period }}</th>
-              {% endfor %}
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for player in players %}
+      <div class="table-responsive">
+        <table class="matrix-table table table-bordered">
+          <thead class="table-dark">
             <tr>
-              <td>{{ player }}</td>
+              <th>{{ _('Player') }}</th>
               {% for opponent in opponents %}
                 {% for period in periods %}
-                  {% set key = (opponent ~ "_" ~ period ~ "_" ~ player).replace(" ", "_") %}
-                  <td>
-                    <input class="form-check-input" type="checkbox" name="{{ key }}" {% if matrix.get(key) %}checked{% endif %}>
-                  </td>
+                  <th>{{ opponent }}<br>{{ _('Period') }} {{ period }}</th>
                 {% endfor %}
               {% endfor %}
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-3">💾 {{ _('Save Matrix') }}</button>
-  </form>
+          </thead>
+          <tbody>
+            {% for player in players %}
+              <tr>
+                <td>{{ player.alias }}</td>
+                {% for opponent in opponents %}
+                  {% for period in periods %}
+                    {% set field_name = (opponent ~ '_' ~ period ~ '_' ~ player.name).replace(' ', '_') %}
+                    <td>
+                      <input type="checkbox" name="{{ field_name }}"
+                        {% if matrix.get(field_name) %}checked{% endif %}>
+                    </td>
+                  {% endfor %}
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="text-end mt-3">
+        <button type="submit" class="btn btn-primary">💾 {{ _('Save Matrix') }}</button>
+      </div>
+    </form>
 
   <!-- Summary Stats -->
   {% if stats %}
