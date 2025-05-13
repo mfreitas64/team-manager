@@ -48,9 +48,9 @@ def practice_register():
         try:
             from_date = datetime.strptime(filter_date_str, '%Y-%m-%d').date()
         except ValueError:
-            from_date = datetime.today().date() - timedelta(weeks=2)
+            from_date = datetime.today().date() - timedelta(weeks=40)
     else:
-        from_date = datetime.today().date() - timedelta(weeks=2)
+        from_date = datetime.today().date() - timedelta(weeks=40)
 
     past_registers = PracticeRegisterModel.query.filter(
         PracticeRegisterModel.user_id == current_user.id,
