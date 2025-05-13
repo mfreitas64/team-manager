@@ -36,13 +36,15 @@
 
         <div class="col-12">
           <label class="form-label">{{ _('Select Players') }}</label>
-          <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+          <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
             <div class="row">
               {% for player in players %}
                 <div class="col-6 col-md-4">
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}">
-                    <label class="form-check-label">{{ player.name }}</label>
+                    <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}" id="player{{ loop.index }}">
+                    <label class="form-check-label" for="player{{ loop.index }}">
+                      {{ player.alias }}
+                    </label>
                   </div>
                 </div>
               {% endfor %}
@@ -74,7 +76,29 @@
               <strong>{{ _('Date:') }}</strong> {{ t.date }}<br>
               <strong>{{ _('Place:') }}</strong> {{ t.place }}<br>
               <strong>{{ _('Opponents:') }}</strong> {{ t.opponents }}<br>
-              <strong>{{ _('Players:') }}</strong> {{ t.players }}<br>
+              <strong>{{ _('Players:') }}</strong>
+              {% for name in t.players.split(',') if name.strip() %}
+                {{ alias_lookup.get(name.strip(), name.strip()) }}{% if not loop.last %}, {% endif %}
+              {% endfor %}<br>
+              {% if t.opponents %}
+                <strong>{{ _('Opponent Teams:') }}</strong>
+                {% for opponent in t.opponents.split(',') %}
+                  {{ opponent.strip() }}{% if not loop.last %}, {% endif %}
+                {% endfor %}<br>
+              {% endif %}
+              {% if t.players %}
+                <strong>{{ _('Player Names:') }}</strong>
+                {% for player in t.players.split(',') %}
+                  {{ player.strip() }}{% if not loop.last %}, {% endif %}
+                {% endfor %}<br>
+              {% endif %}
+              {% if t.date %}
+                <strong>{{ _('Date:') }}</strong> {{ t.date }}<br>
+              {% endif %}
+              {% if t.place %}
+                <strong>{{ _('Place:') }}</strong> {{ t.place }}<br>
+              {% endif %}
+
               {% if t.coach_notes %}
                 <strong>{{ _('Notes:') }}</strong> <em>{{ t.coach_notes }}</em><br>
               {% endif %}

@@ -15,7 +15,9 @@ def manage_tournaments():
     if not season_id:
         return redirect(url_for('season.manage_seasons'))  # or return a default response
     
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
+    alias_lookup = {p.name: (p.alias or p.name) for p in raw_players}
 
     if request.method == 'POST':
         opponents = [
@@ -42,7 +44,7 @@ def manage_tournaments():
 
     open_form = request.args.get('open') == 'form'
     all_tournaments = TournamentModel.query.filter_by(user_id=current_user.id, season_id=season_id).order_by(TournamentModel.date.desc()).all()  
-    return render_template('tournaments.html', tournaments=all_tournaments, players=all_players, open_form=open_form)
+    return render_template('tournaments.html', tournaments=all_tournaments, players=all_players, open_form=open_form,alias_lookup=alias_lookup)
 
 @tournaments_bp.route('/<int:tournament_id>', methods=['GET', 'POST'])
 @login_required
@@ -137,7 +139,8 @@ def edit_tournament(tournament_id):
     if tournament.user_id != current_user.id or tournament.season_id != season_id:
         return "⛔️ Unauthorized", 403
     
-    all_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
 
     if request.method == 'POST':
         tournament.date = request.form['date']
