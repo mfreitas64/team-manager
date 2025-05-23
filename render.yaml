@@ -1,9 +1,10 @@
 services:
   - type: web
     name: basketball-manager
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn wsgi:app"
+    env: docker
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    healthCheckPath: /
     envVars:
       - key: DATABASE_URL
         sync: false

@@ -1,16 +1,26 @@
-from flask import Blueprint, send_file, current_app
+from flask import Blueprint, send_file, current_app, make_response, session, url_for, redirect, request, render_template, send_file
 from flask_login import login_required, current_user
 from io import BytesIO, StringIO
+from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from collections import defaultdict
+from weasyprint import HTML
+from datetime import datetime
 import csv
-from flask import make_response
-from flask import session, url_for, redirect
+import os
+import base64
+from reportlab.platypus import Image as PlatypusImage
 
-from app.models import TournamentModel, TournamentMatrixModel, PlayerModel, PracticeRegisterModel
+from app.models import TournamentModel, TournamentMatrixModel, PlayerModel, PracticeRegisterModel, PlayerSeasonStatsModel, SeasonModel
 
 export_bp = Blueprint('export', __name__, url_prefix='/export')
+    
+def encode_image_base64(path):
+    with open(path, "rb") as image_file:
+        encoded = base64.b64encode(image_file.read()).decode("utf-8")
+        return f"data:image/jpeg;base64,{encoded}"
 
 @export_bp.route('/tournament/<int:tournament_id>/pdf')
 @login_required
@@ -237,3 +247,350 @@ def export_totals_csv():
     output.headers["Content-Disposition"] = "attachment; filename=dashboard_totals.csv"
     output.headers["Content-type"] = "text/csv"
     return output
+
+@export_bp.route('/export/players/csv')
+@login_required
+def export_players_csv():
+    player_id = request.args.get('player_id')
+    season_id = session.get('season_id')
+
+    query = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id)
+    if player_id:
+        query = query.filter_by(id=player_id)
+
+    players = query.all()
+
+    si = StringIO()
+    writer = csv.writer(si)
+    writer.writerow(['Alias', 'Name', 'Escalão', 'Carteira', 'DOB', 'Phone', 'Email'])
+
+    for p in players:
+        writer.writerow([p.alias or '', p.name, p.escalao, p.n_carteira, p.dob, p.mobile_phone, p.email])
+
+    response = make_response(si.getvalue())
+    filename = f"{'player' if player_id else 'all_players'}_export.csv"
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    response.headers['Content-Type'] = 'text/csv'
+    return response
+
+@export_bp.route('/export/players/pdf')
+@login_required
+def export_players_pdf():
+    player_id = request.args.get('player_id')
+    season_id = session.get('season_id')
+
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
+    season = SeasonModel.query.get(season_id)
+    season_title = season.name if season else "Current Season"
+
+    query = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id)
+    if player_id:
+        query = query.filter_by(id=player_id)
+
+    players = query.all()
+
+    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    tournament_ids = [t.id for t in TournamentModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()]
+    matrix_entries = TournamentMatrixModel.query.filter(
+        TournamentMatrixModel.tournament_id.in_(tournament_ids)
+    ).all()
+
+    stats_lookup = defaultdict(lambda: {"practice_minutes": 0, "total_practices": 0, "game_minutes": 0, "total_games": 0})
+    seen_games = set()
+
+    for reg in registers:
+        if reg.players_present:
+            for name in reg.players_present.split(','):
+                name = name.strip()
+                stats_lookup[name]["practice_minutes"] += reg.duration_minutes or 0
+                stats_lookup[name]["total_practices"] += 1
+
+    for entry in matrix_entries:
+        if entry.played:
+            stats_lookup[entry.player_name.strip()]["game_minutes"] += 6
+            key = (entry.player_name.strip(), entry.tournament_id, entry.opponent_name.strip())
+            if key not in seen_games:
+                stats_lookup[entry.player_name.strip()]["total_games"] += 1
+                seen_games.add(key)
+
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    logo_path = os.path.join(current_app.root_path, 'static', 'logo_illiabum.jpg')
+
+    for player in players:
+        stats = stats_lookup[player.name]
+        season_stats = PlayerSeasonStatsModel.query.filter_by(player_id=player.id, season_id=season_id).first()
+
+        # Logo
+        if os.path.exists(logo_path):
+            try:
+                img = PlatypusImage(logo_path, width=2.5*cm, height=2.5*cm)
+                img.drawOn(pdf, 2*cm, height - 3*cm)
+            except Exception as e:
+                print("Logo draw error:", e)
+
+        # Header
+        pdf.setFont("Helvetica-Bold", 16)
+        pdf.drawString(6*cm, height - 2.5*cm, player.name)
+        pdf.setFont("Helvetica", 10)
+        pdf.drawString(6*cm, height - 3.2*cm, season_title)
+
+        y = height - 4.5*cm
+        section_x = 1.9 * cm
+        section_width = 17 * cm
+
+        def section_header(title):
+            nonlocal y
+            y -= 0.5*cm
+            pdf.setFillColor(colors.HexColor("#003366"))  # blue header
+            pdf.rect(section_x, y - 0.2*cm, section_width, 0.9*cm, fill=1, stroke=0)
+            pdf.setFillColor(colors.white)
+            pdf.setFont("Helvetica-Bold", 13)
+            pdf.drawString(section_x + 0.5*cm, y, title)
+            y -= 1.1*cm
+            pdf.setFillColor(colors.black)
+
+        def draw_section_box(y_start, y_end):
+            box_height = y_start - y_end + 0.5*cm
+            pdf.setStrokeColor(colors.black)
+            pdf.setLineWidth(0.5)
+            pdf.rect(section_x, y_end - 0.2*cm, section_width, box_height, stroke=1, fill=0)
+
+        def line(label, value):
+            nonlocal y
+            pdf.setFont("Helvetica-Bold", 10)
+            pdf.drawString(section_x + 0.5*cm, y, f"{label}:")
+            pdf.setFont("Helvetica", 10)
+            pdf.drawString(section_x + 4.5*cm, y, str(value) if value else "—")
+            y -= 0.6*cm
+
+        def multiline(label, text, width):
+            nonlocal y
+            pdf.setFont("Helvetica-Bold", 10)
+            pdf.drawString(section_x + 0.5*cm, y, f"{label}:")
+            y -= 0.5*cm
+            pdf.setFont("Helvetica", 10)
+
+            text = text or "—"
+            lines = []
+            line_text = ""
+            for word in text.split():
+                if pdf.stringWidth(line_text + " " + word) > width:
+                    lines.append(line_text)
+                    line_text = word
+                else:
+                    line_text = f"{line_text} {word}".strip()
+            lines.append(line_text)
+
+            for l in lines:
+                pdf.drawString(section_x + 1*cm, y, l)
+                y -= 0.5*cm
+
+            y -= 0.4*cm  # extra gap between fields
+
+        # 🔲 Personal Info
+        y_start = y + 1.6*cm
+        section_header("Personal Info")
+        line("Alias", player.alias or "—")
+        line("Escalão", player.escalao)
+        line("Carteira Nº", player.n_carteira)
+        line("Date of Birth", player.dob)
+        line("Phone", player.mobile_phone)
+        line("Email", player.email)
+        draw_section_box(y_start, y)
+
+        # 🔲 Season Stats
+        y_start = y + 1.6*cm
+        section_header("Season Stats")
+        line("Minutes Practiced", stats["practice_minutes"])
+        line("Minutes Played", stats["game_minutes"])
+        line("Total Practices", stats["total_practices"])
+        line("Total Games", stats["total_games"])
+        draw_section_box(y_start, y)
+
+        # 🔲 Coach Evaluation
+        y_start = y + 1.6*cm
+        section_header("Coach Evaluation")
+        multiline("Behavior", getattr(season_stats, "behavior", "—"), width=15*cm)
+        multiline("Technical Skills", getattr(season_stats, "technical_skills", "—"), width=15*cm)
+        multiline("Team Relation", getattr(season_stats, "team_relation", "—"), width=15*cm)
+        multiline("Improvement Areas", getattr(season_stats, "improvement_areas", "—"), width=15*cm)
+        draw_section_box(y_start, y)
+
+        pdf.showPage()
+
+    pdf.save()
+    buffer.seek(0)
+    filename = f"{'player' if player_id else 'all_players'}_export.pdf"
+    return send_file(buffer, as_attachment=True, download_name=filename, mimetype='application/pdf')
+
+@export_bp.route('/players/pdf/summary')
+@login_required
+def export_players_summary_pdf():
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
+    players = PlayerModel.query.filter_by(
+        user_id=current_user.id,
+        season_id=season_id
+    ).order_by(PlayerModel.escalao, PlayerModel.n_carteira).all()
+
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=landscape(A4))
+    width, height = landscape(A4)
+
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(2 * cm, height - 2 * cm, "Team Roster – Summary Report")
+
+    pdf.setFont("Helvetica-Bold", 10)
+    headers = ["Nº Carteira", "Alias", "Name", "Escalão", "DOB", "Phone", "Email"]
+    x_positions = [2*cm, 4.5*cm, 7.5*cm, 11*cm, 14*cm, 17*cm, 20*cm]
+
+    y = height - 3*cm
+    for i, header in enumerate(headers):
+        pdf.drawString(x_positions[i], y, header)
+
+    pdf.setFont("Helvetica", 9)
+    y -= 0.7 * cm
+
+    for player in players:
+        row = [
+            player.n_carteira,
+            player.alias or "",
+            player.name,
+            player.escalao,
+            str(player.dob),
+            player.mobile_phone or "",
+            player.email or ""
+        ]
+        for i, cell in enumerate(row):
+            pdf.drawString(x_positions[i], y, str(cell))
+        y -= 0.6 * cm
+        if y < 2*cm:
+            pdf.showPage()
+            y = height - 2.5 * cm
+
+    pdf.save()
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name="players_summary.pdf", mimetype='application/pdf')
+
+@export_bp.route('/export/players/pdf-html')
+@login_required
+def export_players_pdf_html():
+    player_id = request.args.get('player_id')
+    season_id = session.get('season_id')
+    season = SeasonModel.query.get(season_id)
+    season_name = season.name if season else "Current Season"
+
+    players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id)
+    if player_id:
+        players = players.filter_by(id=player_id)
+
+    players = players.all()
+
+    # Calculate stats dynamically per player
+    registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    matrix_entries = TournamentMatrixModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+
+    enriched = []
+    for p in players:
+        # Practice stats
+        practice_minutes = 0
+        total_practices = 0
+        for r in registers:
+            if p.name in (r.players_present or ""):
+                practice_minutes += r.duration_minutes or 0
+                total_practices += 1
+
+        # Game stats
+        game_minutes = 0
+        games_seen = set()
+        for entry in matrix_entries:
+            if entry.player_name == p.name and entry.played:
+                game_minutes += 6
+                games_seen.add((entry.tournament_id, entry.opponent_name))
+
+        total_games = len(games_seen)
+
+        # Season evaluation fields
+        stats = PlayerSeasonStatsModel.query.filter_by(player_id=p.id, season_id=season_id).first()
+
+        enriched.append({
+            "name": p.name,
+            "alias": p.alias,
+            "escalao": p.escalao,
+            "n_carteira": p.n_carteira,
+            "dob": p.dob,
+            "mobile_phone": p.mobile_phone,
+            "email": p.email,
+            "practice_minutes": practice_minutes,
+            "game_minutes": game_minutes,
+            "total_practices": total_practices,
+            "total_games": total_games,
+            "behavior": getattr(stats, "behavior", "—"),
+            "technical_skills": getattr(stats, "technical_skills", "—"),
+            "team_relation": getattr(stats, "team_relation", "—"),
+            "improvement_areas": getattr(stats, "improvement_areas", "—")
+        })
+
+    # Inline logo
+    logo_path = os.path.join(current_app.root_path, "static", "logo_illiabum.jpg")
+    logo_data = encode_image_base64(logo_path) if os.path.exists(logo_path) else None
+
+    html = render_template(
+        "player_pdf.html",
+        players=enriched,
+        logo_data=logo_data,
+        season_name=season_name
+    )
+
+    pdf = BytesIO()
+    HTML(string=html).write_pdf(pdf)
+    pdf.seek(0)
+
+    return send_file(
+        pdf,
+        mimetype="application/pdf",
+        download_name="player_export.pdf",
+        as_attachment=True
+    )
+
+@export_bp.route('/export/players/pdf-summary')
+@login_required
+def export_players_summary_pdf_html():
+    season_id = session.get('season_id')
+
+    players = PlayerModel.query.filter_by(
+        user_id=current_user.id,
+        season_id=season_id
+    ).order_by(
+        PlayerModel.escalao,
+        PlayerModel.n_carteira,
+        PlayerModel.dob
+    ).all()
+
+    logo_path = os.path.join(current_app.root_path, "static", "logo_illiabum.jpg")
+    logo_data = encode_image_base64(logo_path) if os.path.exists(logo_path) else None
+
+    html = render_template(
+        "players_summary.html",
+        players=players,
+        logo_data=logo_data,
+        now=datetime.now()
+    )
+
+    pdf = BytesIO()
+    HTML(string=html).write_pdf(pdf)
+    pdf.seek(0)
+
+    return send_file(
+        pdf,
+        mimetype="application/pdf",
+        download_name="players_summary.pdf",
+        as_attachment=True
+    )

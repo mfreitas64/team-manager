@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Team Roster</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 2cm;
+    }
+
+    body {
+      font-family: sans-serif;
+      font-size: 10pt;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1.5em;
+      margin-bottom: 1em;
+      border-bottom: 2px solid #003366;
+      padding-bottom: 0.5em;
+    }
+
+    .logo {
+      height: 60px;
+    }
+
+    .header-title {
+      font-size: 18pt;
+      font-weight: bold;
+      color: #003366;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 6px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #003366;
+      color: white;
+      font-size: 9pt;
+    }
+
+    td {
+      font-size: 9pt;
+    }
+
+    footer {
+      position: running(footer);
+      font-size: 9pt;
+      text-align: center;
+      margin-top: 2em;
+      border-top: 1px solid #ccc;
+      padding-top: 0.5em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    {% if logo_data %}
+      <img src="{{ logo_data }}" alt="Logo" class="logo">
+    {% endif %}
+    <div class="header-title">Sub-10 Masculinos – 2024/2025</div>
+  </header>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Escalão</th>
+        <th>Nº Carteira</th>
+        <th>Alias</th>
+        <th>Name</th>
+        <th>DOB</th>
+        <th>Phone</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in players %}
+      <tr>
+        <td>{{ p.escalao }}</td>
+        <td>{{ p.n_carteira }}</td>
+        <td>{{ p.alias }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.dob }}</td>
+        <td>{{ p.mobile_phone }}</td>
+        <td>{{ p.email }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <footer>
+    Printed on {{ now.strftime('%Y-%m-%d') }} – Page <span class="pageNumber"></span> of <span class="totalPages"></span>
+  </footer>
+</body>
+</html>

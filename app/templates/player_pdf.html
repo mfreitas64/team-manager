@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Player Evaluation</title>
+  <style>
+    /* all your styles here */
+  </style>
+</head>
+<body>
+  <style>
+    body {
+      font-family: sans-serif;
+      font-size: 12pt;
+      margin: 2cm;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1.5em;
+      border-bottom: 2px solid #003366;
+      padding-bottom: 0.5em;
+      margin-bottom: 1em;
+    }
+
+    .logo {
+      height: 80px;
+      width: auto;
+    }
+
+    .header-info h1 {
+      font-size: 20pt;
+      color: #003366;
+      margin: 0;
+    }
+
+    .header-info p {
+      margin: 0.2em 0 0 0;
+      font-weight: bold;
+    }
+
+    .section {
+      border: 1px solid #000;
+      padding: 1em;
+      margin-bottom: 2em;
+      page-break-inside: avoid;
+    }
+
+    .section h2 {
+      background-color: #003366;
+      color: white;
+      padding: 0.4em 0.8em;
+      margin: -1em -1em 1em -1em;
+      font-size: 14pt;
+    }
+
+    .section p {
+      margin: 0.6em 0;
+      line-height: 1.4;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+
+  {% for player in players %}
+    <header>
+      {% if logo_data %}
+        <img src="{{ logo_data }}" alt="Logo" class="logo">
+      {% endif %}
+      <div class="header-info">
+        <h1>Player Evaluation</h1>
+        <p>{{ player.name }} – {{ season_name }}</p>
+      </div>
+    </header>
+
+    <div class="section">
+      <h2>Personal Info</h2>
+      <p><span class="label">Alias:</span> {{ player.alias }}</p>
+      <p><span class="label">Escalão:</span> {{ player.escalao }}</p>
+      <p><span class="label">Carteira Nº:</span> {{ player.n_carteira }}</p>
+      <p><span class="label">Date of Birth:</span> {{ player.dob }}</p>
+      <p><span class="label">Phone:</span> {{ player.mobile_phone }}</p>
+      <p><span class="label">Email:</span> {{ player.email }}</p>
+    </div>
+
+    <div class="section">
+      <h2>Season Stats</h2>
+      <p><span class="label">Minutes Practiced:</span> {{ player.practice_minutes }}</p>
+      <p><span class="label">Minutes Played:</span> {{ player.game_minutes }}</p>
+      <p><span class="label">Total Practices:</span> {{ player.total_practices }}</p>
+      <p><span class="label">Total Games:</span> {{ player.total_games }}</p>
+    </div>
+
+    <div class="section">
+      <h2>Coach Evaluation</h2>
+      <p><span class="label">Behavior:</span> {{ player.behavior }}</p>
+      <p><span class="label">Technical Skills:</span> {{ player.technical_skills }}</p>
+      <p><span class="label">Team Relation:</span> {{ player.team_relation }}</p>
+      <p><span class="label">Improvement Areas:</span> {{ player.improvement_areas }}</p>
+    </div>
+
+    {% if not loop.last %}
+      <div class="page-break"></div>
+    {% endif %}
+  {% endfor %}
+</body>
+</html>

@@ -61,6 +61,33 @@
 
 <hr class="my-4">
 
+<!-- Export Controls -->
+<form method="get" class="row g-2 align-items-end mb-4" action="">
+  <div class="col-md-6 col-sm-12">
+    <label for="player_id" class="form-label">{{ _('Select a Player (optional)') }}</label>
+    <select class="form-select" id="player_id" name="player_id">
+      <option value="">{{ _('All Players') }}</option>
+      {% for player in players %}
+        <option value="{{ player.id }}">{{ player.alias or player.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-6 col-sm-12 d-flex gap-2 flex-wrap">
+    <a class="btn btn-outline-danger mt-4"
+       href="#"
+       onclick="exportData('pdf')">📄 {{ _('Export PDF') }}</a>
+
+    <a class="btn btn-outline-success mt-4"
+       href="#"
+       onclick="exportData('csv')">📊 {{ _('Export CSV') }}</a>
+
+    <a class="btn btn-outline-primary mt-4"
+      href="{{ url_for('export.export_players_summary_pdf_html') }}"
+      target="_blank">📋 {{ _('Export Summary PDF') }}</a>
+  </div>
+</form>
+
 <h2 class="mt-4">📋 {{ _('Team Roster') }}</h2>
 
 <!-- Table View (desktop and tablet) -->
@@ -113,6 +140,7 @@
       <div class="card-body">
         <h5 class="card-title">{{ player.alias }}</h5>
         <p class="card-text mb-1"><strong>{{ _('Name:') }}</strong> {{ player.name }}</p>
+        <p class="card-text mb-1"><strong>{{ _('Alias:') }}</strong> {{ player.alias }}</p>
         <p class="card-text mb-1"><strong>{{ _('Escalão:') }}</strong> {{ player.escalao }}</p>
         <p class="card-text mb-1"><strong>{{ _('Carteira:') }}</strong> {{ player.n_carteira }}</p>
         <p class="card-text mb-1"><strong>{{ _('DOB:') }}</strong> {{ player.dob }}</p>
@@ -154,5 +182,29 @@
       icon.innerText = '▼';
     }
   });
+</script>
+
+<script>
+  function exportData(format) {
+    const playerId = document.getElementById("player_id").value;
+
+    // Use url_for to generate the base URL
+    let baseUrl = {
+      pdf: "{{ url_for('export.export_players_pdf_html') }}",
+      csv: "{{ url_for('export.export_players_csv') }}"
+    }[format];
+
+    if (!baseUrl) {
+      alert("Unsupported format: " + format);
+      return;
+    }
+
+    let url = baseUrl;
+    if (playerId) {
+      url += `?player_id=${playerId}`;
+    }
+
+    window.open(url, '_blank');
+  }
 </script>
 {% endblock %}
