@@ -4,7 +4,6 @@
 
 {% block content %}
 <div class="container">
-  <!-- Tournament Form Accordion -->
   <div class="card mb-4 mx-auto shadow-sm" style="max-width: 1000px;">
     <div class="card-header d-flex justify-content-between align-items-center"
          onclick="toggleForm()"
@@ -36,20 +35,18 @@
 
         <div class="col-12">
           <label class="form-label">{{ _('Select Players') }}</label>
-          <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
-            <div class="row">
-              {% for player in players %}
-                <div class="col-6 col-md-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}" id="player{{ loop.index }}">
-                    <label class="form-check-label" for="player{{ loop.index }}">
-                      {{ player.alias }}
-                    </label>
-                  </div>
+          <div class="d-flex flex-wrap gap-2 border rounded p-2" id="playerCards">
+            {% for player in players %}
+              <div class="card text-center player-card" data-player="{{ player.name }}" onclick="togglePlayer(this)" style="cursor:pointer;">
+                <div class="card-body p-2">
+                  <small>{{ player.alias }}</small>
                 </div>
-              {% endfor %}
-            </div>
+              </div>
+            {% endfor %}
           </div>
+          {% for player in players %}
+            <input type="checkbox" name="players" value="{{ player.name }}" id="chk_{{ loop.index }}" hidden>
+          {% endfor %}
         </div>
 
         <div class="col-12">
@@ -64,7 +61,6 @@
     </div>
   </div>
 
-  <!-- Tournament List -->
   <h4 class="mb-3">📋 {{ _('Saved Tournaments') }}</h4>
   <div class="row">
     {% for t in tournaments %}
@@ -80,31 +76,11 @@
               {% for name in t.players.split(',') if name.strip() %}
                 {{ alias_lookup.get(name.strip(), name.strip()) }}{% if not loop.last %}, {% endif %}
               {% endfor %}<br>
-              {% if t.opponents %}
-                <strong>{{ _('Opponent Teams:') }}</strong>
-                {% for opponent in t.opponents.split(',') %}
-                  {{ opponent.strip() }}{% if not loop.last %}, {% endif %}
-                {% endfor %}<br>
-              {% endif %}
-              {% if t.players %}
-                <strong>{{ _('Player Names:') }}</strong>
-                {% for player in t.players.split(',') %}
-                  {{ player.strip() }}{% if not loop.last %}, {% endif %}
-                {% endfor %}<br>
-              {% endif %}
-              {% if t.date %}
-                <strong>{{ _('Date:') }}</strong> {{ t.date }}<br>
-              {% endif %}
-              {% if t.place %}
-                <strong>{{ _('Place:') }}</strong> {{ t.place }}<br>
-              {% endif %}
-
               {% if t.coach_notes %}
                 <strong>{{ _('Notes:') }}</strong> <em>{{ t.coach_notes }}</em><br>
               {% endif %}
             </p>
 
-            <!-- Actions -->
             <div class="d-flex flex-wrap gap-2 mt-auto">
               <a class="btn btn-outline-primary btn-sm" href="{{ url_for('tournaments.tournament_detail', tournament_id=t.id) }}">📊 {{ _('Matrix') }}</a>
               <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('export.generate_tournament_pdf', tournament_id=t.id) }}" target="_blank">📄 PDF</a>
@@ -136,12 +112,22 @@
     icon.innerText = isHidden ? '▼' : '➕';
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('formSection');
-    const icon = document.getElementById('toggleIcon');
-    if (!form.classList.contains('d-none')) {
-      icon.innerText = '▼';
+  function togglePlayer(card) {
+    const name = card.getAttribute('data-player');
+    const input = [...document.getElementsByName('players')].find(el => el.value === name);
+    if (card.classList.contains('bg-success')) {
+      card.classList.remove('bg-success', 'text-white');
+      card.classList.add('bg-light');
+      input.checked = false;
+    } else {
+      card.classList.remove('bg-light');
+      card.classList.add('bg-success', 'text-white');
+      input.checked = true;
     }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.player-card').forEach(card => card.classList.add('bg-light'));
   });
 </script>
 {% endblock %}

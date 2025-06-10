@@ -16,7 +16,10 @@ def manage_tournaments():
         return redirect(url_for('season.manage_seasons'))  # or return a default response
     
     raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
-    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
+    all_players = sorted(
+    [{"name": p.name, "alias": p.alias or p.name} for p in raw_players],
+    key=lambda x: x["alias"].lower())
+
     alias_lookup = {p.name: (p.alias or p.name) for p in raw_players}
 
     if request.method == 'POST':
@@ -140,7 +143,9 @@ def edit_tournament(tournament_id):
         return "⛔️ Unauthorized", 403
     
     raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
-    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
+    all_players = sorted(
+    [{"name": p.name, "alias": p.alias or p.name} for p in raw_players],
+    key=lambda x: x["alias"].lower())
 
     if request.method == 'POST':
         tournament.date = request.form['date']

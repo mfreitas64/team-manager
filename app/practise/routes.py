@@ -16,7 +16,9 @@ def practice_register():
         return redirect(url_for('season.manage_seasons'))
 
     raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
-    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
+    all_players = sorted(
+    [{"name": p.name, "alias": p.alias or p.name} for p in raw_players],
+    key=lambda x: x["alias"].lower())
     alias_lookup = {p["name"]: p["alias"] for p in all_players}
 
     all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
@@ -92,7 +94,9 @@ def edit_practice_register(register_id):
         return "⛔️ Unauthorized", 403
 
     raw_players = PlayerModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
-    all_players = [{"name": p.name, "alias": p.alias or p.name} for p in raw_players]
+    all_players = sorted(
+    [{"name": p.name, "alias": p.alias or p.name} for p in raw_players],
+    key=lambda x: x["alias"].lower())
 
     all_exercises = PracticeExerciseModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
 

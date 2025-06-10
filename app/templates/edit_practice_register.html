@@ -3,7 +3,7 @@
 {% block title %}{{ _('Edit Practice Register – Team Manager') }}{% endblock %}
 
 {% block content %}
-<div class="card mx-auto" style="max-width: 750px;">
+<div class="card mx-auto" style="max-width: 900px;">
   <div class="card-header text-center">
     ✏️ {{ _('Edit Practice Register') }} – {{ register.date }}
   </div>
@@ -17,39 +17,52 @@
 
       <div class="col-md-3">
         <label class="form-label">{{ _('Duration (minutes)') }}</label>
-        <input type="number" name="duration_minutes"
-               class="form-control"
-               min="0"
-               value="{{ register.duration_minutes or 0 }}"
-               required>
+        <input type="number" name="duration_minutes" class="form-control" min="0" value="{{ register.duration_minutes or 0 }}" required>
       </div>
 
+      <!-- Player Selection -->
       <div class="col-12">
         <label class="form-label">{{ _('Players Present') }}</label>
-        <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto; white-space: normal;">
+        <div class="d-flex flex-wrap gap-2 border rounded p-2" id="playerCards">
           {% for player in players %}
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}" id="player{{ loop.index }}"
-                    {% if player.name in selected_players %}checked{% endif %}>
-              <label class="form-check-label" for="player{{ loop.index }}">
-                {{ player.alias }}
-              </label>
+            <div class="card text-center player-card {% if player.name in selected_players %}bg-success text-white{% else %}bg-light{% endif %}" data-player="{{ player.name }}" onclick="togglePlayer(this)" style="cursor:pointer;">
+              <div class="card-body p-2">
+                <small>{{ player.alias }}</small>
+              </div>
             </div>
           {% endfor %}
         </div>
+        {% for player in players %}
+          <input type="checkbox" name="players" value="{{ player.name }}" id="chk_{{ loop.index }}" hidden {% if player.name in selected_players %}checked{% endif %}>
+        {% endfor %}
       </div>
 
+      <!-- Exercise Selection with accordion + hover preview -->
       <div class="col-12">
         <label class="form-label">{{ _('Exercises Used') }}</label>
-        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-          {% for e in exercises %}
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="exercises" value="{{ e.id }}"
-                     {% if e.id|string in selected_exercises %}checked{% endif %}>
-              <label class="form-check-label">
-                {{ e.category }} – {{ e.execution_description[:40] }}...
-              </label>
+        <div class="accordion" id="exerciseAccordion">
+          {% set categories = exercises|map(attribute='category')|list|unique %}
+          {% for cat in categories %}
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading_{{ loop.index }}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ loop.index }}" aria-expanded="false" aria-controls="collapse_{{ loop.index }}">
+                {{ cat }}
+              </button>
+            </h2>
+            <div id="collapse_{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading_{{ loop.index }}" data-bs-parent="#exerciseAccordion">
+              <div class="accordion-body">
+                {% for e in exercises if e.category == cat %}
+                <div class="form-check mb-2 position-relative">
+                  <input class="form-check-input" type="checkbox" name="exercises" value="{{ e.id }}" id="ex{{ e.id }}" {% if e.id|string in selected_exercises %}checked{% endif %}>
+                  <label class="form-check-label hover-preview" for="ex{{ e.id }}" data-description="{{ e.execution_description|e }}" data-material="{{ e.needed_material|e }}">
+                    <strong>{{ e.execution_description[:80] }}</strong><br>
+                    <small>{{ _('Material') }}: {{ e.needed_material }}</small>
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
             </div>
+          </div>
           {% endfor %}
         </div>
       </div>
@@ -67,4 +80,53 @@
     </form>
   </div>
 </div>
+{% endblock %}
+
+{% block js %}
+<script>
+  function togglePlayer(card) {
+    const name = card.getAttribute('data-player');
+    const input = [...document.getElementsByName('players')].find(el => el.value === name);
+    if (card.classList.contains('bg-success')) {
+      card.classList.remove('bg-success', 'text-white');
+      card.classList.add('bg-light');
+      input.checked = false;
+    } else {
+      card.classList.remove('bg-light');
+      card.classList.add('bg-success', 'text-white');
+      input.checked = true;
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const preview = document.createElement('div');
+    preview.className = 'exercise-preview';
+    preview.style.position = 'absolute';
+    preview.style.zIndex = '1000';
+    preview.style.background = '#fdfdfd';
+    preview.style.border = '1px solid #ccc';
+    preview.style.padding = '8px';
+    preview.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+    preview.style.display = 'none';
+    preview.style.maxWidth = '300px';
+    preview.style.pointerEvents = 'none';
+    document.body.appendChild(preview);
+
+    document.querySelectorAll('.hover-preview').forEach(el => {
+      el.addEventListener('mouseenter', (e) => {
+        const desc = el.dataset.description;
+        const mat = el.dataset.material;
+        preview.innerHTML = `<strong>{{ _('Description') }}:</strong> ${desc}<br><strong>{{ _('Material') }}:</strong> ${mat}`;
+        preview.style.display = 'block';
+      });
+      el.addEventListener('mousemove', (e) => {
+        preview.style.top = (e.pageY + 15) + 'px';
+        preview.style.left = (e.pageX + 15) + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        preview.style.display = 'none';
+      });
+    });
+  });
+</script>
 {% endblock %}

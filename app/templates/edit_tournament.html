@@ -3,7 +3,7 @@
 {% block title %}{{ _('Edit Tournament – Team Manager') }}{% endblock %}
 
 {% block content %}
-<div class="card mx-auto" style="max-width: 800px;">
+<div class="card mx-auto" style="max-width: 900px;">
   <div class="card-header text-center">
     ✏️ {{ _('Edit Tournament') }}: {{ tournament.team_name }}
   </div>
@@ -33,23 +33,20 @@
       {% endfor %}
 
       <div class="col-12">
-      <label class="form-label">{{ _('Select Players') }}</label>
-          <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
-            <div class="row">
-              {% for player in all_players %}
-                <div class="col-6 col-md-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="players" value="{{ player.name }}" id="player{{ loop.index }}"
-                            {% if player.name in current_players %}checked{% endif %}>
-                    <label class="form-check-label" for="player{{ loop.index }}">
-                      {{ player.alias }}
-                    </label>
-                  </div>
-                </div>
-              {% endfor %}
+        <label class="form-label">{{ _('Select Players') }}</label>
+        <div class="d-flex flex-wrap gap-2 border rounded p-2" id="playerCards">
+          {% for player in all_players %}
+            <div class="card text-center player-card {% if player.name in current_players %}bg-success text-white{% else %}bg-light{% endif %}" data-player="{{ player.name }}" onclick="togglePlayer(this)" style="cursor:pointer;">
+              <div class="card-body p-2">
+                <small>{{ player.alias }}</small>
+              </div>
             </div>
-          </div>
+          {% endfor %}
         </div>
+        {% for player in all_players %}
+          <input type="checkbox" name="players" value="{{ player.name }}" id="chk_{{ loop.index }}" hidden {% if player.name in current_players %}checked{% endif %}>
+        {% endfor %}
+      </div>
 
       <div class="col-12">
         <label class="form-label">{{ _('Coach Notes') }}</label>
@@ -64,4 +61,30 @@
     </form>
   </div>
 </div>
+{% endblock %}
+
+{% block js %}
+<script>
+  function togglePlayer(card) {
+    const name = card.getAttribute('data-player');
+    const input = [...document.getElementsByName('players')].find(el => el.value === name);
+    if (card.classList.contains('bg-success')) {
+      card.classList.remove('bg-success', 'text-white');
+      card.classList.add('bg-light');
+      input.checked = false;
+    } else {
+      card.classList.remove('bg-light');
+      card.classList.add('bg-success', 'text-white');
+      input.checked = true;
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.player-card').forEach(card => {
+      if (!card.classList.contains('bg-success')) {
+        card.classList.add('bg-light');
+      }
+    });
+  });
+</script>
 {% endblock %}
