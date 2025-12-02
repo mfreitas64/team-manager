@@ -6,14 +6,19 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from collections import defaultdict
-from weasyprint import HTML
+try:
+    from weasyprint import HTML
+    WEASYPRINT_AVAILABLE = True
+except (ImportError, OSError):
+    WEASYPRINT_AVAILABLE = False
+    print("⚠️ WeasyPrint not available - some PDF exports will be disabled")
 from datetime import datetime
 import csv
 import os
 import base64
 from reportlab.platypus import Image as PlatypusImage
 
-from app.models import TournamentModel, TournamentMatrixModel, PlayerModel, PracticeRegisterModel, PlayerSeasonStatsModel, SeasonModel
+from app.models import TournamentModel, TournamentMatrixModel, PlayerModel, PracticeRegisterModel, PlayerSeasonStatsModel, SeasonModel, PracticeExerciseModel
 
 export_bp = Blueprint('export', __name__, url_prefix='/export')
     
@@ -276,6 +281,9 @@ def export_players_csv():
 @export_bp.route('/export/players/pdf-html')
 @login_required
 def export_players_pdf_html():
+    if not WEASYPRINT_AVAILABLE:
+        return "WeasyPrint not available on this system. Please use CSV export or install GTK libraries.", 503
+    
     player_id = request.args.get('player_id')
     season_id = session.get('season_id')
     season = SeasonModel.query.get(season_id)
@@ -357,6 +365,9 @@ def export_players_pdf_html():
 @export_bp.route('/export/players/pdf-summary')
 @login_required
 def export_players_summary_pdf_html():
+    if not WEASYPRINT_AVAILABLE:
+        return "WeasyPrint not available on this system. Please use CSV export or install GTK libraries.", 503
+    
     season_id = session.get('season_id')
 
     players = PlayerModel.query.filter_by(
@@ -388,3 +399,232 @@ def export_players_summary_pdf_html():
         download_name="players_summary.pdf",
         as_attachment=True
     )
+
+@export_bp.route('/practice-register/pdf')
+@login_required
+def export_practice_register_pdf():
+    """Export practice register to PDF for a selected month in tabular format"""
+    
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
+    # Get month/year from query params (default to current month)
+    year = request.args.get('year', type=int) or datetime.now().year
+    month = request.args.get('month', type=int) or datetime.now().month
+
+    # Calculate date range for the month
+    from calendar import monthrange
+    _, last_day = monthrange(year, month)
+    start_date = datetime(year, month, 1).date()
+    end_date = datetime(year, month, last_day).date()
+
+    # Get practice registers for the month
+    registers = PracticeRegisterModel.query.filter(
+        PracticeRegisterModel.user_id == current_user.id,
+        PracticeRegisterModel.season_id == season_id,
+        PracticeRegisterModel.date >= start_date,
+        PracticeRegisterModel.date <= end_date
+    ).order_by(PracticeRegisterModel.date.asc()).all()
+
+    # Get all players sorted by name
+    raw_players = PlayerModel.query.filter_by(
+        user_id=current_user.id, 
+        season_id=season_id
+    ).order_by(PlayerModel.name).all()
+    
+    # Get season name
+    season = SeasonModel.query.get(season_id)
+    season_name = season.name if season else f"Season {season_id}"
+
+    # Build attendance matrix: player_name -> {date -> present}
+    attendance = {}
+    practice_dates = []
+    
+    for reg in registers:
+        practice_dates.append(reg.date)
+        players_present = [p.strip() for p in reg.players_present.split(',') if p.strip()]
+        
+        for player in raw_players:
+            if player.name not in attendance:
+                attendance[player.name] = {}
+            attendance[player.name][reg.date] = player.name in players_present
+
+    # Generate PDF using ReportLab (Landscape for better width)
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=landscape(A4))
+    width, height = landscape(A4)
+    
+    margin = 30
+    y = height - margin
+    
+    # Title
+    c.setFont("Helvetica-Bold", 16)
+    month_names = ['', 'January', 'February', 'March', 'April', 'May', 'June', 
+                   'July', 'August', 'September', 'October', 'November', 'December']
+    title = f"{month_names[month]} {year} - Practice Attendance"
+    c.drawCentredString(width / 2, y, title)
+    y -= 20
+    
+    # Season info
+    c.setFont("Helvetica", 9)
+    c.drawCentredString(width / 2, y, f"Season: {season_name}")
+    y -= 25
+
+    if not practice_dates:
+        c.setFont("Helvetica-Oblique", 11)
+        c.drawString(margin, y, "No practice sessions recorded for this month.")
+        c.save()
+        buffer.seek(0)
+        return send_file(buffer, as_attachment=True,
+                        download_name=f"practice_register_{year}_{month:02d}.pdf",
+                        mimetype='application/pdf')
+
+    # Calculate table dimensions
+    player_col_width = 180  # Increased width for full names
+    num_practices = len(practice_dates)
+    date_col_width = max(35, min(50, (width - margin * 2 - player_col_width) / num_practices))
+    cell_height = 18
+    
+    table_y = y
+    x_start = margin
+    
+    # Draw header row - Practice dates
+    c.setFont("Helvetica-Bold", 7)
+    
+    # Player name column header
+    c.setFillColor(colors.HexColor('#eb6636'))  # Coral theme
+    c.rect(x_start, table_y - cell_height, player_col_width, cell_height, fill=1, stroke=1)
+    c.setFillColor(colors.white)
+    c.drawString(x_start + 5, table_y - cell_height + 6, "Player Name")
+    
+    # Date column headers
+    for idx, practice_date in enumerate(practice_dates):
+        x = x_start + player_col_width + (idx * date_col_width)
+        c.setFillColor(colors.HexColor('#eb6636'))
+        c.rect(x, table_y - cell_height, date_col_width, cell_height, fill=1, stroke=1)
+        c.setFillColor(colors.white)
+        date_str = practice_date.strftime('%d/%m')
+        c.drawCentredString(x + date_col_width / 2, table_y - cell_height + 6, date_str)
+    
+    table_y -= cell_height
+    
+    # Draw player rows
+    c.setFillColor(colors.black)
+    for player in raw_players:
+        # Check if we need a new page
+        if table_y < 60:
+            c.showPage()
+            table_y = height - margin
+            
+            # Redraw headers on new page
+            c.setFont("Helvetica-Bold", 7)
+            c.setFillColor(colors.HexColor('#eb6636'))
+            c.rect(x_start, table_y - cell_height, player_col_width, cell_height, fill=1, stroke=1)
+            c.setFillColor(colors.white)
+            c.drawString(x_start + 5, table_y - cell_height + 6, "Player Name")
+            
+            for idx, practice_date in enumerate(practice_dates):
+                x = x_start + player_col_width + (idx * date_col_width)
+                c.setFillColor(colors.HexColor('#eb6636'))
+                c.rect(x, table_y - cell_height, date_col_width, cell_height, fill=1, stroke=1)
+                c.setFillColor(colors.white)
+                date_str = practice_date.strftime('%d/%m')
+                c.drawCentredString(x + date_col_width / 2, table_y - cell_height + 6, date_str)
+            
+            table_y -= cell_height
+            c.setFillColor(colors.black)
+        
+        # Player name cell
+        c.setFont("Helvetica", 7)
+        c.rect(x_start, table_y - cell_height, player_col_width, cell_height, stroke=1, fill=0)
+        player_name = player.name
+        # Truncate if too long
+        if len(player_name) > 32:
+            player_name = player_name[:29] + "..."
+        c.drawString(x_start + 5, table_y - cell_height + 6, player_name)
+        
+        # Attendance cells
+        c.setFont("Helvetica-Bold", 10)
+        for idx, practice_date in enumerate(practice_dates):
+            x = x_start + player_col_width + (idx * date_col_width)
+            c.rect(x, table_y - cell_height, date_col_width, cell_height, stroke=1, fill=0)
+            
+            # Mark P for present, F for absent
+            if player.name in attendance and practice_date in attendance[player.name]:
+                if attendance[player.name][practice_date]:
+                    c.setFillColor(colors.green)
+                    c.drawCentredString(x + date_col_width / 2, table_y - cell_height + 5, "P")
+                else:
+                    c.setFillColor(colors.red)
+                    c.drawCentredString(x + date_col_width / 2, table_y - cell_height + 5, "F")
+                c.setFillColor(colors.black)
+        
+        table_y -= cell_height
+    
+    # Summary statistics at bottom - NEW PAGE for all players
+    c.showPage()
+    y_summary = height - margin
+    
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(margin, y_summary, "Attendance Summary")
+    y_summary -= 25
+    
+    c.setFont("Helvetica-Bold", 10)
+    total_practices = len(practice_dates)
+    c.drawString(margin, y_summary, f"📊 Total Practices: {total_practices}")
+    y_summary -= 20
+    
+    # Calculate attendance percentages for ALL players and sort by percentage
+    player_stats = []
+    for player in raw_players:
+        if player.name in attendance:
+            present_count = sum(1 for attended in attendance[player.name].values() if attended)
+            percentage = (present_count / total_practices * 100) if total_practices > 0 else 0
+            player_stats.append({
+                'name': player.name,
+                'present_count': present_count,
+                'percentage': percentage
+            })
+    
+    # Sort by percentage descending
+    player_stats.sort(key=lambda x: x['percentage'], reverse=True)
+    
+    c.setFont("Helvetica", 8)
+    c.setFont("Helvetica-Bold", 8)
+    c.drawString(margin, y_summary, "Player")
+    c.drawString(margin + 200, y_summary, "Attended")
+    c.drawString(margin + 280, y_summary, "Percentage")
+    y_summary -= 15
+    
+    c.setFont("Helvetica", 8)
+    for stat in player_stats:
+        if y_summary < 60:
+            c.showPage()
+            y_summary = height - margin
+            c.setFont("Helvetica-Bold", 8)
+            c.drawString(margin, y_summary, "Player")
+            c.drawString(margin + 200, y_summary, "Attended")
+            c.drawString(margin + 280, y_summary, "Percentage")
+            y_summary -= 15
+            c.setFont("Helvetica", 8)
+        
+        player_display = stat['name'] if len(stat['name']) <= 35 else stat['name'][:32] + "..."
+        c.drawString(margin, y_summary, player_display)
+        c.drawString(margin + 200, y_summary, f"{stat['present_count']}/{total_practices}")
+        c.drawString(margin + 280, y_summary, f"{stat['percentage']:.0f}%")
+        y_summary -= 12
+
+    c.save()
+    buffer.seek(0)
+    
+    return send_file(buffer, as_attachment=True,
+                    download_name=f"practice_register_{year}_{month:02d}.pdf",
+                    mimetype='application/pdf')
+
+    c.save()
+    buffer.seek(0)
+    
+    return send_file(buffer, as_attachment=True,
+                    download_name=f"practice_register_{year}_{month:02d}.pdf",
+                    mimetype='application/pdf')

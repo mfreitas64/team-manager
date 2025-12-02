@@ -96,6 +96,39 @@
   </div>
 </form>
 
+<!-- Export Section -->
+<div class="card mb-4" style="max-width: 600px; background-color: #fff8f0;">
+  <div class="card-body">
+    <h6 class="card-title">📄 {{ _('Export Practice Register') }}</h6>
+    <form method="get" action="{{ url_for('export.export_practice_register_pdf') }}" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label for="export_month" class="form-label">{{ _('Month') }}</label>
+        <select name="month" id="export_month" class="form-select" required>
+          <option value="1">{{ _('January') }}</option>
+          <option value="2">{{ _('February') }}</option>
+          <option value="3">{{ _('March') }}</option>
+          <option value="4">{{ _('April') }}</option>
+          <option value="5">{{ _('May') }}</option>
+          <option value="6">{{ _('June') }}</option>
+          <option value="7">{{ _('July') }}</option>
+          <option value="8">{{ _('August') }}</option>
+          <option value="9">{{ _('September') }}</option>
+          <option value="10">{{ _('October') }}</option>
+          <option value="11">{{ _('November') }}</option>
+          <option value="12">{{ _('December') }}</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="export_year" class="form-label">{{ _('Year') }}</label>
+        <input type="number" name="year" id="export_year" class="form-control" min="2020" max="2030" required>
+      </div>
+      <div class="col-md-4">
+        <button type="submit" class="btn btn-success w-100">{{ _('Download PDF') }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Past Practice Logs -->
 <h4>📚 {{ _('Past Practice Logs') }}</h4>
 <div class="list-group">
@@ -161,6 +194,11 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.player-card').forEach(card => card.classList.add('bg-light'));
+
+    // Set current month and year for PDF export
+    const now = new Date();
+    document.getElementById('export_month').value = now.getMonth() + 1;
+    document.getElementById('export_year').value = now.getFullYear();
 
     const preview = document.createElement('div');
     preview.className = 'exercise-preview';
