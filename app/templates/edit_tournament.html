@@ -10,6 +10,12 @@
   <div class="card-body">
     <form method="post" class="row g-3">
 
+      <div class="col-12">
+        <div class="alert alert-info mb-0">
+          ℹ️ {{ _('Matrix data is kept when editing tournament details. If you change opponents or selected players, the matrix will be rebuilt.') }}
+        </div>
+      </div>
+
       <div class="col-md-4">
         <label class="form-label">{{ _('Date') }}</label>
         <input type="date" name="date" class="form-control" value="{{ tournament.date }}" required>

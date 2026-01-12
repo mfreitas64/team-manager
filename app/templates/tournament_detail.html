@@ -48,6 +48,10 @@
     <a href="{{ url_for('tournaments.edit_tournament', tournament_id=tournament.id) }}" class="btn btn-warning btn-sm">✏️ {{ _('Edit Tournament') }}</a>
   </div>
 
+  <div class="alert alert-info py-2">
+    ℹ️ {{ _('Matrix is preserved across tournament edits. Use the delete buttons to remove a player/opponent from the matrix.') }}
+  </div>
+
   <!-- Matrix Form -->
   <form method="post">
       <div class="table-responsive">
@@ -57,7 +61,15 @@
               <th>{{ _('Player') }}</th>
               {% for opponent in opponents %}
                 {% for period in periods %}
-                  <th>{{ opponent }}<br>{{ _('Period') }} {{ period }}</th>
+                  <th>
+                    <div class="d-flex flex-column align-items-center gap-1">
+                      <div>{{ opponent }}</div>
+                      <div class="small">{{ _('Period') }} {{ period }}</div>
+                      {% if period == periods[0] %}
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteOpponent('{{ opponent|e }}')">🗑️</button>
+                      {% endif %}
+                    </div>
+                  </th>
                 {% endfor %}
               {% endfor %}
             </tr>
@@ -65,7 +77,12 @@
           <tbody>
             {% for player in players %}
               <tr>
-                <td>{{ player.alias }}</td>
+                <td>
+                  <div class="d-flex justify-content-between align-items-center gap-2">
+                    <span>{{ player.alias }}</span>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="deletePlayer('{{ player.name|e }}')">🗑️</button>
+                  </div>
+                </td>
                 {% for opponent in opponents %}
                   {% for period in periods %}
                     {% set field_name = (opponent ~ '_' ~ period ~ '_' ~ player.name).replace(' ', '_') %}
@@ -103,4 +120,39 @@
 
 {% block js %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  async function postFormUrlEncoded(url, data) {
+    const body = new URLSearchParams(data);
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body
+    });
+    return resp;
+  }
+
+  async function deletePlayer(playerName) {
+    if (!confirm("{{ _('Delete this player from matrix?') }}")) return;
+    const url = "{{ url_for('tournaments.delete_matrix_player', tournament_id=tournament.id) }}";
+    const resp = await postFormUrlEncoded(url, { player_name: playerName });
+    if (!resp.ok) {
+      alert('Delete failed');
+      return;
+    }
+    window.location.reload();
+  }
+
+  async function deleteOpponent(opponentName) {
+    if (!confirm("{{ _('Delete this opponent from matrix?') }}")) return;
+    const url = "{{ url_for('tournaments.delete_matrix_opponent', tournament_id=tournament.id) }}";
+    const resp = await postFormUrlEncoded(url, { opponent_name: opponentName });
+    if (!resp.ok) {
+      alert('Delete failed');
+      return;
+    }
+    window.location.reload();
+  }
+</script>
 {% endblock %}

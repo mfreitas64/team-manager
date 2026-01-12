@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect, session, flash
 from flask_login import login_required, current_user
 from app.models import TournamentModel, TournamentMatrixModel, PlayerModel
 from app.extensions import db
@@ -84,24 +84,36 @@ def tournament_detail(tournament_id):
     periods = [1, 2, 3, 4]
 
     if request.method == 'POST':
-        # Clear previous matrix entries for this tournament
-        TournamentMatrixModel.query.filter_by(tournament_id=tournament_id, season_id=season_id).delete()
+        existing_entries = TournamentMatrixModel.query.filter_by(
+            tournament_id=tournament_id,
+            season_id=season_id,
+            user_id=current_user.id,
+        ).all()
+        existing_lookup = {
+            (m.opponent_name, m.period, m.player_name): m
+            for m in existing_entries
+        }
 
         for opponent in opponents:
             for period in periods:
                 for player in players:
                     field_name = f"{opponent}_{period}_{player['name']}".replace(" ", "_")
                     played = request.form.get(field_name) == "on"
-                    matrix_entry = TournamentMatrixModel(
-                        tournament_id=tournament_id,
-                        user_id=current_user.id,
-                        season_id=season_id,
-                        player_name=player['name'],
-                        opponent_name=opponent,
-                        period=period,
-                        played=played
-                    )
-                    db.session.add(matrix_entry)
+
+                    key = (opponent, period, player['name'])
+                    matrix_entry = existing_lookup.get(key)
+                    if matrix_entry is None:
+                        matrix_entry = TournamentMatrixModel(
+                            tournament_id=tournament_id,
+                            user_id=current_user.id,
+                            season_id=season_id,
+                            player_name=player['name'],
+                            opponent_name=opponent,
+                            period=period,
+                        )
+                        db.session.add(matrix_entry)
+
+                    matrix_entry.played = played
 
         db.session.commit()
         return redirect(f'/tournament/{tournament_id}')
@@ -109,13 +121,21 @@ def tournament_detail(tournament_id):
     # Preload existing matrix data
     existing_matrix = {
         f"{m.opponent_name}_{m.period}_{m.player_name}".replace(" ", "_"): m.played
-        for m in TournamentMatrixModel.query.filter_by(tournament_id=tournament_id, season_id=season_id).all()
+        for m in TournamentMatrixModel.query.filter_by(
+            tournament_id=tournament_id,
+            season_id=season_id,
+            user_id=current_user.id,
+        ).all()
     }
 
     # Stats summary
     from collections import defaultdict
     stats = defaultdict(int)
-    for entry in TournamentMatrixModel.query.filter_by(tournament_id=tournament_id, season_id=season_id).all():
+    for entry in TournamentMatrixModel.query.filter_by(
+        tournament_id=tournament_id,
+        season_id=season_id,
+        user_id=current_user.id,
+    ).all():
         if entry.played:
             stats[entry.player_name.strip()] += 6  # 6 minutes per period
 
@@ -165,6 +185,74 @@ def edit_tournament(tournament_id):
                            all_players=all_players,
                            current_players=current_players,
                            current_opponents=current_opponents)
+
+
+@tournaments_bp.route('/<int:tournament_id>/matrix/delete-player', methods=['POST'])
+@login_required
+def delete_matrix_player(tournament_id):
+
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
+    tournament = TournamentModel.query.get_or_404(tournament_id)
+    if tournament.user_id != current_user.id or tournament.season_id != season_id:
+        return "⛔️ Unauthorized", 403
+
+    player_name = (request.form.get('player_name') or '').strip()
+    if player_name:
+        TournamentMatrixModel.query.filter_by(
+            tournament_id=tournament_id,
+            season_id=season_id,
+            user_id=current_user.id,
+            player_name=player_name,
+        ).delete()
+
+        # Also remove from tournament roster so UI no longer shows it
+        current_players = [p.strip() for p in (tournament.players or '').split(',') if p.strip()]
+        updated_players = [p for p in current_players if p != player_name]
+        tournament.players = ','.join(updated_players)
+
+        db.session.commit()
+        flash('✅ Player removed from matrix', 'success')
+    else:
+        flash('⚠️ No player specified', 'warning')
+
+    return redirect(url_for('tournaments.tournament_detail', tournament_id=tournament_id))
+
+
+@tournaments_bp.route('/<int:tournament_id>/matrix/delete-opponent', methods=['POST'])
+@login_required
+def delete_matrix_opponent(tournament_id):
+
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
+    tournament = TournamentModel.query.get_or_404(tournament_id)
+    if tournament.user_id != current_user.id or tournament.season_id != season_id:
+        return "⛔️ Unauthorized", 403
+
+    opponent_name = (request.form.get('opponent_name') or '').strip()
+    if opponent_name:
+        TournamentMatrixModel.query.filter_by(
+            tournament_id=tournament_id,
+            season_id=season_id,
+            user_id=current_user.id,
+            opponent_name=opponent_name,
+        ).delete()
+
+        # Also remove from tournament opponents so UI no longer shows it
+        current_opponents = [o.strip() for o in (tournament.opponents or '').split(',') if o.strip()]
+        updated_opponents = [o for o in current_opponents if o != opponent_name]
+        tournament.opponents = ','.join(updated_opponents)
+
+        db.session.commit()
+        flash('✅ Opponent removed from matrix', 'success')
+    else:
+        flash('⚠️ No opponent specified', 'warning')
+
+    return redirect(url_for('tournaments.tournament_detail', tournament_id=tournament_id))
 
 @tournaments_bp.route('/<int:tournament_id>/edit-notes', methods=['POST'])
 @login_required
