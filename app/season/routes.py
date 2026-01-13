@@ -52,5 +52,12 @@ def manage_seasons():
 def set_season():
     selected = request.form.get('season_id')
     if selected:
-        session['season_id'] = int(selected)
+        season_id = int(selected)
+
+        # 🔐 Ensure the selected season belongs to the current user
+        season = SeasonModel.query.filter_by(id=season_id, user_id=current_user.id).first()
+        if season:
+            session['season_id'] = season_id
+            current_user.last_season_id = season_id
+            db.session.commit()
     return redirect(request.referrer or url_for('home.dashboard'))

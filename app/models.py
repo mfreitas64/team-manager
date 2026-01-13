@@ -76,6 +76,7 @@ class UserModel(db.Model, UserMixin):
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(150), nullable=False, unique=True)
     password_hash = db.Column(db.String(512), nullable=False)
+    last_season_id = db.Column(db.Integer, nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
