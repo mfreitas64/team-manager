@@ -51,6 +51,13 @@
 
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav ms-auto">
+        {% if current_user.is_authenticated and current_season %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('season.manage_seasons') }}">
+              <span class="badge bg-light text-dark">{{ _('Season') }}: {{ current_season.name }}</span>
+            </a>
+          </li>
+        {% endif %}
         <li class="nav-item"><a class="nav-link" href="{{ url_for('players.manage_players') }}">{{ _('Players') }}</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('practise.practice_exercises') }}">{{ _('Practice Exercises') }}</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('tournaments.manage_tournaments') }}">{{ _('Tournaments') }}</a></li>

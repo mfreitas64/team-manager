@@ -4,7 +4,7 @@ from flask_babel import Babel, _
 from dotenv import load_dotenv
 import os
 
-from .models import UserModel
+from .models import UserModel, SeasonModel
 from .extensions import db, login_manager
 
 # 🌍 Initialize Babel
@@ -53,6 +53,15 @@ def create_app():
             args['lang'] = lang_code
             return url_for(request.endpoint, **args)
         return dict(url_for_lang=url_for_lang)
+
+    @app.context_processor
+    def inject_current_season():
+        season_id = session.get('season_id')
+        if not season_id or not getattr(current_user, 'is_authenticated', False):
+            return dict(current_season=None)
+
+        season = SeasonModel.query.filter_by(id=season_id, user_id=current_user.id).first()
+        return dict(current_season=season)
 
     # 🧩 Register Blueprints (after globals/context are set)
     from .players.routes import players_bp
