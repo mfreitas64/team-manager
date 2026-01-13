@@ -112,16 +112,24 @@ def player_season_stats(player_id):
 @players_bp.route('/player/<int:player_id>/history')
 @login_required
 def player_history(player_id):
+    season_id = session.get('season_id')
+    if not season_id:
+        return redirect(url_for('season.manage_seasons'))
+
     player = PlayerModel.query.get_or_404(player_id)
 
     # 🔐 Make sure player belongs to the user
-    if player.user_id != current_user.id:
+    if player.user_id != current_user.id or player.season_id != season_id:
         return "⛔ Unauthorized", 403
 
-    # ✅ Fetch all seasons for this user/player
-    all_stats = PlayerSeasonStatsModel.query.filter_by(player_id=player_id).all()
-    all_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id).all()
-    all_matrix_entries = TournamentMatrixModel.query.filter_by(user_id=current_user.id).filter_by(played=True).all()
+    # ✅ Fetch season-scoped data for this user/player
+    all_stats = PlayerSeasonStatsModel.query.filter_by(player_id=player_id, season_id=season_id).all()
+    all_registers = PracticeRegisterModel.query.filter_by(user_id=current_user.id, season_id=season_id).all()
+    all_matrix_entries = TournamentMatrixModel.query.filter_by(
+        user_id=current_user.id,
+        season_id=season_id,
+        played=True,
+    ).all()
 
     # 🔢 Aggregate stats
     total_practices = 0
